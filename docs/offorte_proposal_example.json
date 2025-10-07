@@ -1,0 +1,240 @@
+{
+    "id": 309012,
+    "name": "2025196L Verhaegh Blerick deel 3",
+    "account_user_email": "luc@stb-kozijnen.nl",
+    "account_user_id": 9985,
+    "account_user_name": "Luc Hoeijmakers",
+    "agree": {
+        "formfields": []
+    },
+    "comments": [],
+    "contact": {
+        "id": 257141,
+        "type": "person",
+        "name": "Freddy Verhaegh",
+        "account_user_id": 9984,
+        "city": "Venlo",
+        "coc_number": "",
+        "contact_id": 221840,
+        "country": "",
+        "date_created": "2025-09-01T19:52:03.000000Z",
+        "email": "Freddyverhaegh@gmail.com",
+        "facebook": "",
+        "fax": "",
+        "firstname": "Freddy",
+        "fullname": "Freddy Verhaegh",
+        "instagram": "",
+        "internet": "",
+        "lastname": "Verhaegh",
+        "linkedin": "",
+        "mobile": "",
+        "owner": "Jeroen Mans",
+        "phone": "06 27101627 ",
+        "salutation": "",
+        "state": "",
+        "street": "Van Dolhoffstr 14",
+        "tags": [],
+        "twitter": "",
+        "vat_number": "",
+        "zipcode": "5922TR"
+    },
+    "content": {
+        "pricetables": [
+            {
+                "id": null,
+                "subtotal": 5524,
+                "total": 6684.04,
+                "settings": {
+                    "vat_default_percentage": 21,
+                    "vat_hidden": false,
+                    "rows_include_vat": false
+                },
+                "vat": [
+                    {
+                        "percentage": 21,
+                        "total": 1160.04,
+                        "group_name": "vat21"
+                    }
+                ],
+                "rows": [
+                    {
+                        "content": "<p>Dubbele tuindeuren met vaste zijlichten</p>\n\n<ul>\n\t<li>\n\t<p><em>Hardstenen onderdorpel</em></p>\n\t</li>\n\t<li>\n\t<p><em>Hang- en sluitwerk met 3-puntsluiting</em></p>\n\t</li>\n\t<li>\n\t<p><em>Gelijksluitende cilinders</em></p>\n\t</li>\n\t<li>\n\t<p><em>Veiligheidsglas</em></p>\n\t</li>\n</ul>\n\n<p>\u00a0</p>\n\n<p><em><span style=\"color:#be123c\">*Korting \u20ac484,- korting inclusief btw*</span></em></p>",
+                        "discount_type": true,
+                        "discount_value": "400",
+                        "hide_price": false,
+                        "id": "o-80675cc7-5601-4a21-b420-fd3696155c5f",
+                        "price": 5569,
+                        "quantity": 1,
+                        "recurring_include_in_totals": false,
+                        "recurring_type": false,
+                        "selectable": true,
+                        "subtotal": 5569,
+                        "type": "price",
+                        "unique_id": null,
+                        "user_quantity": false,
+                        "user_selected": true,
+                        "vat_percentage": null
+                    },
+                    {
+                        "content": "<p>Triple glas</p>",
+                        "discount_type": false,
+                        "discount_value": "",
+                        "hide_price": false,
+                        "id": "tr6415370dc2077",
+                        "price": 355,
+                        "quantity": 1,
+                        "recurring_include_in_totals": false,
+                        "recurring_type": false,
+                        "selectable": true,
+                        "subtotal": 355,
+                        "type": "price",
+                        "unique_id": null,
+                        "user_quantity": false,
+                        "user_selected": true,
+                        "vat_percentage": null
+                    }
+                ]
+            }
+        ]
+    },
+    "custom_fields": [],
+    "date_created": "2025-09-05T10:48:53.000000Z",
+    "date_modified": "2025-09-05T12:45:37.000000Z",
+    "date_viewed": "2025-09-05T11:23:30.000000Z",
+    "date_won": "2025-09-05T12:48:03.000000Z",
+    "design_template_id": 14266,
+    "directory_id": null,
+    "emails": [],
+    "logs": {
+        "history": [
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Freddy Verhaegh",
+                "action": "contact: accept proposal",
+                "type": "client"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Freddy Verhaegh",
+                "action": "contact: signed proposal",
+                "type": "client"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "status changed to: Online",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "status changed to: Work in progress",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Freddy Verhaegh",
+                "action": "contact: viewing proposal",
+                "type": "client"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: sent",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: sent",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: change",
+                "type": "user"
+            },
+            {
+                "date": "2025-09-04T22:00:00.000000Z",
+                "person": "Luc Hoeijmakers",
+                "action": "proposal: created",
+                "type": "user"
+            }
+        ],
+        "summary": {
+            "last_modified_date": "2025-09-05T12:45:25.000000Z",
+            "last_modified_user": "Luc Hoeijmakers",
+            "pdf": 0,
+            "recent_view": "Sep 5th 2025",
+            "views": 1
+        }
+    },
+    "price_total": "\u20ac5,524.00",
+    "price_total_original": "5524.00",
+    "price_total_override": null,
+    "proposal_language": "nl",
+    "proposal_nr": "2747",
+    "receivers": [
+        {
+            "id": 257141,
+            "fullname": "Freddy Verhaegh",
+            "email": "Freddyverhaegh@gmail.com",
+            "signature_required": false,
+            "signature_allowed": true,
+            "pass": "https://stb-kozijnen.offorte.com/viewer/309012/pp/yadivevsjC257141"
+        }
+    ],
+    "remarks": "",
+    "status": "won",
+    "tags": [],
+    "text_template_id": 8964
+}

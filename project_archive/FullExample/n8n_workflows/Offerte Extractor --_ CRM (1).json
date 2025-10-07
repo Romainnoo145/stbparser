@@ -1,0 +1,2801 @@
+{
+  "name": "Offerte Extractor --> CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1NS1SAxtu7z6vLBYUn4V3KaEmHeqTbbuB",
+          "mode": "list",
+          "cachedResultName": "STB-kozijnen_Offerte-Parser",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1NS1SAxtu7z6vLBYUn4V3KaEmHeqTbbuB"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        -384
+      ],
+      "id": "fbb5d88e-2f12-4d1d-8398-b70e2e7279da",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ucTp2tZdZdzB30KI",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive Trigger').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -608,
+        -384
+      ],
+      "id": "a00eaf7c-5e8f-4f8f-8f6b-f8c79984d56f",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ucTp2tZdZdzB30KI",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -384
+      ],
+      "id": "fd3b9688-5f60-4c80-b05c-24afb2e5d5fc",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fae86042-9983-4003-aca7-33eb8e5e37de",
+              "name": "Date",
+              "value": "={{ $json.metadata['xmp:modifydate'] }}",
+              "type": "string"
+            },
+            {
+              "id": "695e434b-2376-4bc2-bed6-8bc2d6bc67c7",
+              "name": "Opdrachtnummer",
+              "value": "={{ $('Google Drive Trigger').item.json.name.replace(/^Offerte\\s*/i, '').replace(/\\.pdf$/i, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "ff509568-ec1c-428d-8e14-f44c5bb8f20f",
+              "name": "fullPdfText",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        -384
+      ],
+      "id": "549003d2-4145-4cce-830e-c0df09aae49d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appuXCPmvIwowH78k",
+          "mode": "list",
+          "cachedResultName": "STB Administration",
+          "cachedResultUrl": "https://airtable.com/appuXCPmvIwowH78k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV721agi9cO1RZj",
+          "mode": "list",
+          "cachedResultName": "Inmeetplanning",
+          "cachedResultUrl": "https://airtable.com/appuXCPmvIwowH78k/tblV721agi9cO1RZj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Elementen": "={{ $json.Elementen }}",
+            "Uren": "={{ $json.Uren }}",
+            "Waarde": "={{ $json.Waarde }}",
+            "Total Amount Incl BTW": "={{ $json['Total Amount Incl BTW'] }}",
+            "Aantal Elementen": "={{ $json['Aantal Elementen'] }}",
+            "Geschatte Uren": "={{ $json['Geschatte Uren'] }}",
+            "Klant & Stad": "={{ $json['Klant & Stad'] }}",
+            "Telefoon": "={{ $json.Telefoon }}",
+            "Projectstatus": "Planning Vereist",
+            "Klantnaam": "={{ $json.Klantnaam }}",
+            "E-mail": "={{ $json['E-mail'] }}",
+            "Volledig Adres": "={{ $json['Volledig Adres'] }}",
+            "Stad": "={{ $json.Stad }}",
+            "Postcode": "={{ $json.Postcode }}",
+            "Provincie": "={{ $json.Provincie }}",
+            "Opdracht verkocht op": "={{ $json['Opdracht verkocht op'] }}",
+            "Elementen Overzicht": "={{ $json['Elementen Overzicht'] }}",
+            "Locaties": "={{ $json.Locaties }}",
+            "Planning Notities": "={{ $json['Planning Notities'] }}",
+            "Start Inmeetplanning Trigger": false,
+            "Opdrachtnummer": "={{ $('Edit Fields').item.json.Opdrachtnummer }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klant & Stad",
+              "displayName": "Klant & Stad",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefoon",
+              "displayName": "Telefoon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Elementen",
+              "displayName": "Elementen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Uren",
+              "displayName": "Uren",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Waarde",
+              "displayName": "Waarde",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Projectstatus",
+              "displayName": "Projectstatus",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Planning Vereist",
+                  "value": "Planning Vereist"
+                },
+                {
+                  "name": "Ingepland",
+                  "value": "Ingepland"
+                },
+                {
+                  "name": "Voltooid",
+                  "value": "Voltooid"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klantnaam",
+              "displayName": "Klantnaam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Volledig Adres",
+              "displayName": "Volledig Adres",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Stad",
+              "displayName": "Stad",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Postcode",
+              "displayName": "Postcode",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Provincie",
+              "displayName": "Provincie",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Opdracht verkocht op",
+              "displayName": "Opdracht verkocht op",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Total Amount Incl BTW",
+              "displayName": "Total Amount Incl BTW",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aantal Elementen",
+              "displayName": "Aantal Elementen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Elementen Overzicht",
+              "displayName": "Elementen Overzicht",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Locaties",
+              "displayName": "Locaties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Geschatte Uren",
+              "displayName": "Geschatte Uren",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Planning Notities",
+              "displayName": "Planning Notities",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Uiterlijke montagedatum",
+              "displayName": "Uiterlijke montagedatum",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start Inmeetplanning Trigger",
+              "displayName": "Start Inmeetplanning Trigger",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -96
+      ],
+      "id": "f7c1b137-17cc-405a-a7fc-d9088f2a4fb3",
+      "name": "Airtable Inmeten",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appuXCPmvIwowH78k",
+          "mode": "list",
+          "cachedResultName": "STB Administration",
+          "cachedResultUrl": "https://airtable.com/appuXCPmvIwowH78k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltAZ1v7f8aH4DUi",
+          "mode": "list",
+          "cachedResultName": "Facturatie",
+          "cachedResultUrl": "https://airtable.com/appuXCPmvIwowH78k/tbltAZ1v7f8aH4DUi"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Bedrag": "={{ $json.Bedrag }}",
+            "Factuur ID": "={{ $json['Factuur ID'] }}",
+            "Type Factuur": "={{ $json['Type Factuur'] }}",
+            "Status": "={{ $json.Status }}",
+            "Adres": "={{ $json.Adres }}",
+            "Telefoon": "={{ $json.Telefoon }}",
+            "Email": "={{ $json.Email }}",
+            "Klant": "={{ $json.Klant }}",
+            "Opdrachtnummer": "={{ $('Edit Fields').item.json.Opdrachtnummer }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Factuur ID",
+              "displayName": "Factuur ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type Factuur",
+              "displayName": "Type Factuur",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "30% - Vooraf",
+                  "value": "30% - Vooraf"
+                },
+                {
+                  "name": "65% - Start",
+                  "value": "65% - Start"
+                },
+                {
+                  "name": "5% - Oplevering",
+                  "value": "5% - Oplevering"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Bedrag",
+              "displayName": "Bedrag",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Concept",
+                  "value": "Concept"
+                },
+                {
+                  "name": "Verzonden",
+                  "value": "Verzonden"
+                },
+                {
+                  "name": "Betaald",
+                  "value": "Betaald"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Verstuurd op",
+              "displayName": "Verstuurd op",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Vervaldatum",
+              "displayName": "Vervaldatum",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klant",
+              "displayName": "Klant",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefoon",
+              "displayName": "Telefoon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Adres",
+              "displayName": "Adres",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Factuurtitel",
+              "displayName": "Factuurtitel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        96
+      ],
+      "id": "626acd1f-4dfc-4d7c-bab1-004c07ebe0fc",
+      "name": "Airtable Facturatie",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app9mz6mT0zk8XRGm",
+          "mode": "list",
+          "cachedResultName": "STB Sales Review",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblSpZbJ5Nxmxgsbi",
+          "mode": "list",
+          "cachedResultName": "Elementen Review",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm/tblSpZbJ5Nxmxgsbi"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Breedte (mm)": "={{ $json[\"Breedte (mm)\"] }}",
+            "Hoogte (mm)": "={{ $json[\"Hoogte (mm)\"] }}",
+            "Hoofdproduct Prijs": "={{ $json[\"Hoofdproduct Prijs\"] }}",
+            "Totaal Regelitems": "={{ $json[\"Totaal Regelitems\"] }}",
+            "Regelitem 1 Prijs": 0,
+            "Regelitem 2 Prijs": 0,
+            "Regelitem 3 Prijs": 0,
+            "Regelitem 4 Prijs": 0,
+            "Regelitem 5 Prijs": 0,
+            "Element Subtotaal": 0,
+            "Element Korting": 0,
+            "Element Totaal": 0,
+            "Element BTW": 0,
+            "Element Totaal Incl BTW": 0,
+            "Regelitem 6 Prijs": 0,
+            "Regelitem 7 Prijs": 0,
+            "Regelitem 8 Prijs": 0,
+            "Regelitem 9 Prijs": 0,
+            "Regelitem 10 Prijs": 0,
+            "Definitieve Element Prijs": 0,
+            "Opdrachtnummer": "={{ $('Edit Fields').item.json.Opdrachtnummer }}",
+            "Element ID Ref": "={{ $json.Klantnaam }}-{{ $json[\"Element ID Ref\"] }}",
+            "Element ID": "={{ $json[\"Element ID\"] }}",
+            "Klantnaam": "={{ $json.Klantnaam }}",
+            "Element Type": "={{ $json[\"Element Type\"] }}",
+            "Locatie": "={{ $json.Locatie }}",
+            "Geoffreerde Afmetingen": "={{ $json[\"Geoffreerde Afmetingen\"] }}",
+            "Hoofdproduct": "={{ $json.Hoofdproduct }}",
+            "Hoofdproduct Groep": "={{ $json[\"Hoofdproduct Groep\"] }}",
+            "Alle Regelitems Detail": "={{ $json[\"Alle Regelitems Detail\"] }}",
+            "Regelitem 1": "={{ $json[\"Regelitem 1\"] }}",
+            "Regelitem 2": "={{ $json[\"Regelitem 2\"] }}",
+            "Regelitem 3": "={{ $json[\"Regelitem 3\"] }}"
+          },
+          "matchingColumns": [
+            "Opdrachtnummer"
+          ],
+          "schema": [
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element ID Ref",
+              "displayName": "Element ID Ref",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element ID",
+              "displayName": "Element ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klantnaam",
+              "displayName": "Klantnaam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Type",
+              "displayName": "Element Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Locatie",
+              "displayName": "Locatie",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Geoffreerde Afmetingen",
+              "displayName": "Geoffreerde Afmetingen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Breedte (mm)",
+              "displayName": "Breedte (mm)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hoogte (mm)",
+              "displayName": "Hoogte (mm)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hoofdproduct",
+              "displayName": "Hoofdproduct",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hoofdproduct Groep",
+              "displayName": "Hoofdproduct Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "STB-KO-V",
+                  "value": "STB-KO-V"
+                },
+                {
+                  "name": "STB-KO-VV",
+                  "value": "STB-KO-VV"
+                },
+                {
+                  "name": "STB-KO-VVV",
+                  "value": "STB-KO-VVV"
+                },
+                {
+                  "name": "STB-KO-VAL",
+                  "value": "STB-KO-VAL"
+                },
+                {
+                  "name": "STB-KO-DK",
+                  "value": "STB-KO-DK"
+                },
+                {
+                  "name": "STB-DK-V",
+                  "value": "STB-DK-V"
+                },
+                {
+                  "name": "STB-KO-DK-D",
+                  "value": "STB-KO-DK-D"
+                },
+                {
+                  "name": "STB-KO-DK-DK",
+                  "value": "STB-KO-DK-DK"
+                },
+                {
+                  "name": "STB-KO-V-DK-V",
+                  "value": "STB-KO-V-DK-V"
+                },
+                {
+                  "name": "STB-KO-DK-V-DK",
+                  "value": "STB-KO-DK-V-DK"
+                },
+                {
+                  "name": "STB-VD-ST",
+                  "value": "STB-VD-ST"
+                },
+                {
+                  "name": "STB-VD-ST-V",
+                  "value": "STB-VD-ST-V"
+                },
+                {
+                  "name": "STB-VD-ST-VV",
+                  "value": "STB-VD-ST-VV"
+                },
+                {
+                  "name": "STB-VD-ST-B",
+                  "value": "STB-VD-ST-B"
+                },
+                {
+                  "name": "STB-AD-ST",
+                  "value": "STB-AD-ST"
+                },
+                {
+                  "name": "STB-AD-VAL",
+                  "value": "STB-AD-VAL"
+                },
+                {
+                  "name": "STB-TD-GLAS",
+                  "value": "STB-TD-GLAS"
+                },
+                {
+                  "name": "STB-TD-BORS",
+                  "value": "STB-TD-BORS"
+                },
+                {
+                  "name": "STB-TD-VV",
+                  "value": "STB-TD-VV"
+                },
+                {
+                  "name": "STB-HSP",
+                  "value": "STB-HSP"
+                },
+                {
+                  "name": "STB-HSP-4",
+                  "value": "STB-HSP-4"
+                },
+                {
+                  "name": "STB-AD06",
+                  "value": "STB-AD06"
+                },
+                {
+                  "name": "STB-Balkon",
+                  "value": "STB-Balkon"
+                },
+                {
+                  "name": "STB-DAKRAAM",
+                  "value": "STB-DAKRAAM"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hoofdproduct Prijs",
+              "displayName": "Hoofdproduct Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Totaal Regelitems",
+              "displayName": "Totaal Regelitems",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Alle Regelitems Detail",
+              "displayName": "Alle Regelitems Detail",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 1",
+              "displayName": "Regelitem 1",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 1 Groep",
+              "displayName": "Regelitem 1 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 1 Prijs",
+              "displayName": "Regelitem 1 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 2",
+              "displayName": "Regelitem 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 2 Groep",
+              "displayName": "Regelitem 2 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 2 Prijs",
+              "displayName": "Regelitem 2 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 3",
+              "displayName": "Regelitem 3",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 3 Groep",
+              "displayName": "Regelitem 3 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 3 Prijs",
+              "displayName": "Regelitem 3 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 4",
+              "displayName": "Regelitem 4",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 4 Groep",
+              "displayName": "Regelitem 4 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 4 Prijs",
+              "displayName": "Regelitem 4 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 5",
+              "displayName": "Regelitem 5",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 5 Groep",
+              "displayName": "Regelitem 5 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 5 Prijs",
+              "displayName": "Regelitem 5 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Subtotaal",
+              "displayName": "Element Subtotaal",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Korting",
+              "displayName": "Element Korting",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Totaal",
+              "displayName": "Element Totaal",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element BTW",
+              "displayName": "Element BTW",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Totaal Incl BTW",
+              "displayName": "Element Totaal Incl BTW",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Verkoop Review Status",
+              "displayName": "Verkoop Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Concept",
+                  "value": "Concept"
+                },
+                {
+                  "name": "Gecontroleerd",
+                  "value": "Gecontroleerd"
+                },
+                {
+                  "name": "Nacalculatie",
+                  "value": "Nacalculatie"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Review Notities",
+              "displayName": "Review Notities",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Auto Cost Lookup Status",
+              "displayName": "Auto Cost Lookup Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Niet geprobeerd",
+                  "value": "Niet geprobeerd"
+                },
+                {
+                  "name": "Succesvol",
+                  "value": "Succesvol"
+                },
+                {
+                  "name": "Handmatig vereist",
+                  "value": "Handmatig vereist"
+                },
+                {
+                  "name": "Fout gevonden",
+                  "value": "Fout gevonden"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 6",
+              "displayName": "Regelitem 6",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 6 Groep",
+              "displayName": "Regelitem 6 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 6 Prijs",
+              "displayName": "Regelitem 6 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 7",
+              "displayName": "Regelitem 7",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 7 Groep",
+              "displayName": "Regelitem 7 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 7 Prijs",
+              "displayName": "Regelitem 7 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 8",
+              "displayName": "Regelitem 8",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 8 Groep",
+              "displayName": "Regelitem 8 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 8 Prijs",
+              "displayName": "Regelitem 8 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 9",
+              "displayName": "Regelitem 9",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 9 Groep",
+              "displayName": "Regelitem 9 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 9 Prijs",
+              "displayName": "Regelitem 9 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 10",
+              "displayName": "Regelitem 10",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 10 Groep",
+              "displayName": "Regelitem 10 Groep",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Regelitem 10 Prijs",
+              "displayName": "Regelitem 10 Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Definitieve Element Prijs",
+              "displayName": "Definitieve Element Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -480
+      ],
+      "id": "b1600290-a595-4e0e-85cf-5899b4684666",
+      "name": "Airtable Elementen Review",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "app9mz6mT0zk8XRGm",
+          "mode": "list",
+          "cachedResultName": "STB Sales Review",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsR6Fe2CIziC2EF",
+          "mode": "list",
+          "cachedResultName": "Klantenportaal",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm/tblsR6Fe2CIziC2EF"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Totaalprijs Excl BTW": "={{ $json[\"Totaalprijs Excl BTW\"] }}",
+            "Totaalprijs Incl BTW": "={{ $json[\"Totaalprijs Incl BTW\"] }}",
+            "Opdrachtnummer": "={{ $('Edit Fields').item.json.Opdrachtnummer }}",
+            "Klantnaam": "={{ $json.Klantnaam }}",
+            "Adres": "={{ $json.Adres }}",
+            "Telefoon": "={{ $json.Telefoon }}",
+            "E-mail": "={{ $json[\"E-mail\"] }}",
+            "Offerte Elementen Overzicht": "={{ $json[\"Offerte Elementen Overzicht\"] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klantnaam",
+              "displayName": "Klantnaam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Adres",
+              "displayName": "Adres",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefoon",
+              "displayName": "Telefoon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Totaalprijs Excl BTW",
+              "displayName": "Totaalprijs Excl BTW",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Totaalprijs Incl BTW",
+              "displayName": "Totaalprijs Incl BTW",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Offerte Elementen Overzicht",
+              "displayName": "Offerte Elementen Overzicht",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Verkoop Notities",
+              "displayName": "Verkoop Notities",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Aangemaakt op",
+              "displayName": "Aangemaakt op",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -864
+      ],
+      "id": "f78dcc96-1f89-4ae1-9bd6-34f390b07fd2",
+      "name": "Airtable Sales Klantgegevens",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appoYgxrhYZP5MAVT",
+          "mode": "list",
+          "cachedResultName": "STB Technisch",
+          "cachedResultUrl": "https://airtable.com/appoYgxrhYZP5MAVT"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWSENbjUJgubLO0",
+          "mode": "list",
+          "cachedResultName": "Projecten",
+          "cachedResultUrl": "https://airtable.com/appoYgxrhYZP5MAVT/tblWSENbjUJgubLO0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Opdrachtnummer": "={{ $('Edit Fields').item.json.Opdrachtnummer }}",
+            "Klant Naam": "={{ $json[\"Klant Naam\"] }}",
+            "Adres": "={{ $json.Adres }}",
+            "Postcode": "={{ $json.Postcode }}",
+            "Plaats": "={{ $json.Plaats }}",
+            "Standaard Profielstijl": "={{ $json[\"Standaard Profielstijl\"] }}",
+            "Standaard Beglazing": "={{ $json[\"Standaard Beglazing\"] }}",
+            "Standaard Afstandhouders": "={{ $json[\"Standaard Afstandhouders\"] }}",
+            "Standaard Kleur Kozijn Binnen": "={{ $json[\"Standaard Kleur Kozijn Binnen\"] }}",
+            "Standaard Kleur Vleugels Binnen": "={{ $json[\"Standaard Kleur Vleugels Binnen\"] }}",
+            "Standaard Kleur Kozijn Buiten": "={{ $json[\"Standaard Kleur Kozijn Buiten\"] }}",
+            "Standaard Kleur Vleugels Buiten": "={{ $json[\"Standaard Kleur Vleugels Buiten\"] }}",
+            "Opmerkingen Project": "={{ $json[\"Opmerkingen Project\"] }}",
+            "Standaard Binnenafwerking": "{{ $json[\"Standaard Kleur Binnenafwerking\"] }}",
+            "Telefoon": "={{ $json.Telefoon }}",
+            "Email": "={{ $json.Email }}",
+            "Verkocht op": "={{ $json[\"Verkocht op\"] }}",
+            "Toegewezen Inmeter": "Donny",
+            "Projectstatus": "Nog in te meten"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klant Naam",
+              "displayName": "Klant Naam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Adres",
+              "displayName": "Adres",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Postcode",
+              "displayName": "Postcode",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Plaats",
+              "displayName": "Plaats",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Projectstatus",
+              "displayName": "Projectstatus",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nog in te meten",
+                  "value": "Nog in te meten"
+                },
+                {
+                  "name": "Inmeten gepland",
+                  "value": "Inmeten gepland"
+                },
+                {
+                  "name": "Inmeten voltooid",
+                  "value": "Inmeten voltooid"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Toegewezen Inmeter",
+              "displayName": "Toegewezen Inmeter",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Jeroen",
+                  "value": "Jeroen"
+                },
+                {
+                  "name": "Donny",
+                  "value": "Donny"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Profielstijl",
+              "displayName": "Standaard Profielstijl",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Beglazing",
+              "displayName": "Standaard Beglazing",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Afstandhouders",
+              "displayName": "Standaard Afstandhouders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Kleur Kozijn Binnen",
+              "displayName": "Standaard Kleur Kozijn Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Kleur Vleugels Binnen",
+              "displayName": "Standaard Kleur Vleugels Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Kleur Kozijn Buiten",
+              "displayName": "Standaard Kleur Kozijn Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Kleur Vleugels Buiten",
+              "displayName": "Standaard Kleur Vleugels Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Standaard Binnenafwerking",
+              "displayName": "Standaard Binnenafwerking",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Opmerkingen Project",
+              "displayName": "Opmerkingen Project",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Elementen",
+              "displayName": "Elementen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefoon",
+              "displayName": "Telefoon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Inmeetdatum",
+              "displayName": "Inmeetdatum",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Verkocht op",
+              "displayName": "Verkocht op",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -672
+      ],
+      "id": "3bcb3d4a-4ef7-4f31-9126-7b24530f26ad",
+      "name": "Airtable Productie Klantgegevens",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pak de data uit de eerste node\nconst items = $input.all();\nconst data = items[0].json;\n\n// Extract basis info\nconst opdrachtnummer = data.opdrachtnummer || \n                      data.filename?.replace(/^Offerte\\s*/, '').replace(/\\.pdf$/, '').trim() ||\n                      null;\n\nconst customerName = data.trimmedPdfText?.match(/Naam\\s+(.+)/)?.[1]?.trim() || null;\n\n// Process alleen deur elementen\nconst deurSpecificaties = [];\n\n(data.merkElements || []).forEach(element => {\n  const body = element.body || '';\n  \n  // Extract element type\n  const elementType = body.match(/Soort kozijn\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || '';\n  \n  // Check of het een deur is\n  const isDoor = elementType.toLowerCase().includes('deur') || \n                 elementType.toLowerCase().includes('pui');\n  \n  if (!isDoor) return; // Skip niet-deur elementen\n  \n  // Extract dimensies\n  const dimensions = body.match(/(\\d{3,4})x(\\d{3,4})mm/);\n  const width = dimensions ? parseInt(dimensions[1]) : null;\n  const height = dimensions ? parseInt(dimensions[2]) : null;\n  \n  // Extract locatie\n  const location = body.match(/Plaats\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || '';\n  \n  // Extract kleuren (als ze in de body staan)\n  const kleurKozijnBinnen = body.match(/Kozijn binnen\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const kleurKozijnBuiten = body.match(/Kozijn buiten\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const kleurVleugelBinnen = body.match(/Vleugel binnen\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const kleurVleugelBuiten = body.match(/Vleugel buiten\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  \n  // Extract deur specifieke details\n  const modelDeur = body.match(/Model deur\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const glasType = body.match(/Glas deurvleugel\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const cilinder = body.match(/Type cilinder\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  const dorpel = body.match(/Soort dorpel\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n  \n  // Extract prijs\n  const totalPrice = body.match(/Totaal\\s+€\\s*([\\d.,]+)/)?.[1];\n  const priceValue = totalPrice ? parseFloat(totalPrice.replace('.', '').replace(',', '.')) : null;\n  \n  // Build deur specificatie object\n  const deurSpec = {\n    // PRIMARY & BASIC INFO\n    \"Element ID\": `${opdrachtnummer} - ${element.header.replace(/^Merk\\s*/i, '')}`,\n    \"Element ID Ref\": element.header.replace(/^Merk\\s*/i, '').trim(),\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Klantnaam\": customerName,\n    \"Element Type\": elementType,\n    \"Locatie\": location,\n    \n    // AFMETINGEN\n    \"Geoffreerde Afmetingen\": width && height ? `${width}mm x ${height}mm` : null,\n    \"Breedte (mm)\": width,\n    \"Hoogte (mm)\": height,\n    \n    // DEUR SPECIFICATIES\n    \"Model Deur\": modelDeur || null,\n    \"Type Profiel\": \"Verdiept\",\n    \"Type Kozijn\": \"Stomp\",\n    \"Draairichting\": \"Wordt met inmeten bepaald\",\n    \"Glas Deurvleugel\": glasType || null,\n    \"Type Cilinder\": cilinder || null,\n    \"Soort Onderdorpel\": dorpel || \"Hardstenen onderdorpel\",\n    \"Afwatering\": \"Onderkant\",\n    \"Binnenafwerking\": \"Kap 6\",\n    \n    // KLEUREN\n    \"Kleur Kozijn Binnen\": kleurKozijnBinnen || null,\n    \"Kleur Kozijn Buiten\": kleurKozijnBuiten || null,\n    \"Kleur Deurvleugel Binnen\": kleurVleugelBinnen || null,\n    \"Kleur Deurvleugel Buiten\": kleurVleugelBuiten || null,\n    \n    // SALES WORKFLOW\n    \"Definitieve Element Prijs\": priceValue,\n    \"Verkoop Review Status\": \"Concept\",\n    \"Opmerkingen voor Binnendienst\": null\n  };\n  \n  // Clean null values voor Airtable\n  const cleanedDeurSpec = {};\n  Object.keys(deurSpec).forEach(key => {\n    if (deurSpec[key] !== null && deurSpec[key] !== undefined) {\n      cleanedDeurSpec[key] = deurSpec[key];\n    }\n  });\n  \n  deurSpecificaties.push(cleanedDeurSpec);\n});\n\n// Return elk deur element als apart item voor Airtable batch processing\nreturn deurSpecificaties.map(spec => ({ json: spec }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -288
+      ],
+      "id": "f825d689-5544-41af-b0f6-8dd7a5957dba",
+      "name": "Deur Specificaties Mapping"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pak de data uit de eerste node\nconst items = $input.all();\nconst data = items[0].json;\n\n// Helper functies\nconst parsePrice = (str) => {\n  if (!str) return null;\n  const cleaned = str.toString()\n    .replace(/€/g, '')\n    .replace(/\\./g, '')\n    .replace(',', '.')\n    .replace(/\\s/g, '')\n    .trim();\n  const parsed = parseFloat(cleaned);\n  return isNaN(parsed) ? null : parsed;\n};\n\n// Extract opdrachtnummer\nconst opdrachtnummer = (() => {\n  if (data.filename) {\n    const match = data.filename.match(/(\\d{7}[A-Z]{2})/);\n    if (match) return match[1];\n    \n    const cleaned = data.filename\n      .replace(/^offerte\\s*/i, '')\n      .replace(/\\.pdf$/i, '')\n      .trim()\n      .split(' ')[0];\n    \n    if (cleaned && cleaned.length >= 5) return cleaned;\n  }\n  return `STB-${Date.now()}`;\n})();\n\n// Extract klantnaam\nconst customerName = (() => {\n  const match = data.trimmedPdfText?.match(/Naam\\s+([^\\n]+)/);\n  if (match) return match[1].trim();\n  \n  if (data.filename) {\n    const parts = data.filename\n      .replace(/\\.pdf$/i, '')\n      .replace(/^offerte\\s*/i, '')\n      .trim()\n      .split(' ');\n    \n    if (parts.length >= 2) {\n      return parts.slice(1).join(' ');\n    }\n  }\n  return 'ONBEKEND';\n})();\n\n// LIJST VAN BEKENDE STB REGELITEMS\nconst KNOWN_REGELITEMS = [\n  'Hardstenen raamdorpel',\n  'Hardstenen onderdorpel',\n  'Houtlookverbinding',\n  'HVL',\n  'Insectenhor',\n  'Plisséhordeur',\n  'Meerprijs afwijkende kleur',\n  'Inclusief vouwhoek',\n  'Inclusief koppelstuk',\n  'Inclusief extra profielen',\n  'Inclusief afwerking',\n  'Inclusief roedeverdeling',\n  'Inclusief staafgreep',\n  'Inclusief HST85',\n  'Inclusief thermostep',\n  'Inclusief hang- & sluitwerk',\n  'Inclusief veiligheidsglas',\n  'Breek- en zaagwerk',\n  'Inzagen hondenluikje',\n  'Afsluitbare kruk',\n  'Brievenbus',\n  'Inslijpen dakpannen',\n  'Zagen dakplaten',\n  'Gootstukken',\n  'Verduisterend rolgordijn',\n  'Binnenafwerking'\n];\n\n// Main processing\nconst elementReviews = [];\n\n(data.merkElements || []).forEach(element => {\n  const body = element.body || '';\n  const header = element.header || '';\n  \n  // Element identificatie\n  const elementCode = element.merkCode || \n                     header.replace(/^Merk\\s*/i, '').split(/[,.\\s]+/)[0];\n  \n  const isGekoppeld = element.coupled || body.includes('Gekoppeld');\n  const variants = element.variants || [elementCode];\n  \n  // Extract basis info\n  const elementType = (() => {\n    const match = body.match(/Soort kozijn\\s+([^\\n]+)/);\n    if (match) {\n      return match[1].replace(/^[A-Z]\\d?\\.\\s*/, '').trim();\n    }\n    return 'Onbekend type';\n  })();\n  \n  const dimensions = (() => {\n    const match = body.match(/(\\d+)x(\\d+)mm/);\n    return match ? \n      { width: parseInt(match[1]), height: parseInt(match[2]) } : \n      { width: null, height: null };\n  })();\n  \n  const location = body.match(/Plaats\\s+([^\\n]+)/)?.[1]?.trim() || '';\n  \n  // SIMPELE PARSER - Zoek direct naar bekende items\n  const parseElementSimple = (bodyText) => {\n    const lines = bodyText.split('\\n');\n    \n    const result = {\n      hoofdproduct: elementType,\n      hoofdproductPrijs: 0,\n      regelitems: [],\n      kortingen: [],\n      totaalRegelitems: 0,\n      totaalKortingen: 0\n    };\n    \n    // Vind eerst het hoofdproduct prijs\n    // Dit is meestal de eerste prijsregel na \"prijs subtotaal\"\n    let foundPrijsSubtotaal = false;\n    let firstPriceFound = false;\n    \n    for (let i = 0; i < lines.length; i++) {\n      const line = lines[i].trim();\n      \n      if (line.toLowerCase() === 'prijs subtotaal') {\n        foundPrijsSubtotaal = true;\n        continue;\n      }\n      \n      if (foundPrijsSubtotaal && !firstPriceFound) {\n        const priceMatch = line.match(/^(\\d+)\\s+€\\s*([\\d.,]+)\\s+€\\s*([\\d.,]+)/);\n        if (priceMatch) {\n          result.hoofdproductPrijs = parsePrice(priceMatch[3]);\n          firstPriceFound = true;\n        }\n      }\n      \n      // Stop bij subtotaal\n      if (line.startsWith('Subtotaal €')) {\n        break;\n      }\n    }\n    \n    // Nu zoek naar regelitems - gewoon zoeken naar bekende termen\n    let currentItem = null;\n    let inOmschrijving = false;\n    \n    for (let i = 0; i < lines.length; i++) {\n      const line = lines[i].trim();\n      \n      if (line.toLowerCase().includes('omschrijving') && line.toLowerCase().includes('aantal')) {\n        inOmschrijving = true;\n        continue;\n      }\n      \n      if (line.toLowerCase() === 'prijs subtotaal') {\n        inOmschrijving = false;\n        continue;\n      }\n      \n      if (line.startsWith('Subtotaal €')) {\n        break;\n      }\n      \n      // Check of deze regel een bekend regelitem bevat\n      if (inOmschrijving) {\n        for (const knownItem of KNOWN_REGELITEMS) {\n          if (line.toLowerCase().includes(knownItem.toLowerCase())) {\n            currentItem = line;\n            \n            // Zoek de prijs voor dit item\n            // Kijk vooruit naar de volgende prijsregels\n            for (let j = i + 1; j < Math.min(i + 10, lines.length); j++) {\n              const nextLine = lines[j].trim();\n              \n              // Check voor prijsregel\n              const priceMatch = nextLine.match(/^(\\d+)\\s+€\\s*([\\d.,]+)\\s+€\\s*([\\d.,]+)(?:\\s+€\\s*-([\\d.,]+))?$/);\n              if (priceMatch) {\n                const quantity = parseInt(priceMatch[1]);\n                const unitPrice = parsePrice(priceMatch[2]);\n                const totalPrice = parsePrice(priceMatch[3]);\n                const discount = priceMatch[4] ? parsePrice(priceMatch[4]) : 0;\n                const netPrice = discount === totalPrice ? 0 : totalPrice - discount;\n                \n                result.regelitems.push({\n                  description: discount === totalPrice ? `${currentItem} (-100% korting)` : currentItem,\n                  quantity: quantity,\n                  unitPrice: unitPrice,\n                  price: netPrice\n                });\n                \n                result.totaalRegelitems += netPrice;\n                currentItem = null;\n                break;\n              }\n            }\n            break;\n          }\n        }\n      }\n      \n      // Check voor kortingsregels\n      if (line.match(/^Korting\\s*([\\d,]+)%?\\s+€\\s*-([\\d.,]+)$/)) {\n        const match = line.match(/^Korting\\s*([\\d,]+)%?\\s+€\\s*-([\\d.,]+)$/);\n        const kortingBedrag = parsePrice(match[2]);\n        result.kortingen.push({\n          description: `Korting ${match[1]}%`,\n          quantity: 1,\n          unitPrice: -kortingBedrag,\n          price: -kortingBedrag\n        });\n        result.totaalKortingen += kortingBedrag;\n      }\n    }\n    \n    return result;\n  };\n  \n  // Parse het element\n  const pricing = parseElementSimple(body);\n  \n  // Extract financiële totalen\n  const subtotalMatch = body.match(/Subtotaal\\s+€\\s*([\\d.,]+)/);\n  const btwMatch = body.match(/21%\\s+btw\\s+€\\s*([\\d.,]+)/);\n  const totalMatches = body.match(/Totaal\\s+€\\s*([\\d.,]+)/g);\n  \n  const subtotal = subtotalMatch ? parsePrice(subtotalMatch[1]) : null;\n  const btw = btwMatch ? parsePrice(btwMatch[1]) : null;\n  \n  let totalIncl = null;\n  if (totalMatches && totalMatches.length > 0) {\n    totalIncl = parsePrice(totalMatches[totalMatches.length - 1].replace(/Totaal\\s+€\\s*/, ''));\n  }\n  \n  // Hoofdproduct groep\n  const bepaalHoofdproductGroep = (type) => {\n    const typeUpper = (type || '').toUpperCase();\n    \n    if (typeUpper.includes('VAST RAAM')) return 'STB-KO-V';\n    if (typeUpper.includes('DRAAIKIEP')) return 'STB-KO-DK';\n    if (typeUpper.includes('DRAAISTOLP')) return 'STB-KO-DK-D';\n    if (typeUpper.includes('VOORDEUR')) return 'STB-VD-ST';\n    if (typeUpper.includes('ACHTERDEUR')) return 'STB-AD-ST';\n    if (typeUpper.includes('SCHUIFPUI')) return 'STB-HSP';\n    if (typeUpper.includes('DAKRAAM')) return 'STB-DAKRAAM';\n    if (isGekoppeld) return 'STB-KO-VAL';\n    \n    return null;\n  };\n  \n  // Build output\n  const elementReview = {\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Element ID Ref\": variants.join(', '),\n    \"Element ID\": elementCode,\n    \"Klantnaam\": customerName,\n    \"Element Type\": elementType,\n    \"Locatie\": location,\n    \"Geoffreerde Afmetingen\": dimensions.width && dimensions.height ? \n      `${dimensions.width}x${dimensions.height}mm` : null,\n    \"Breedte (mm)\": dimensions.width,\n    \"Hoogte (mm)\": dimensions.height,\n    \n    // HOOFDPRODUCT\n    \"Hoofdproduct\": pricing.hoofdproduct,\n    \"Hoofdproduct Groep\": bepaalHoofdproductGroep(elementType),\n    \"Hoofdproduct Prijs\": pricing.hoofdproductPrijs || 0,\n    \n    // REGELITEMS\n    \"Totaal Regelitems\": pricing.regelitems.length,\n    \"Totaal Regelitems Prijs\": pricing.totaalRegelitems,\n    \"Alle Regelitems Detail\": pricing.regelitems.length > 0 ? \n      pricing.regelitems.map(r => \n        `${r.description}: ${r.quantity}x €${r.unitPrice || 0} = €${r.price || 0}`\n      ).join('\\n') : null,\n  };\n  \n  // Voeg individuele regelitems toe\n  for (let i = 0; i < 10; i++) {\n    const item = pricing.regelitems[i];\n    if (item) {\n      elementReview[`Regelitem ${i + 1}`] = item.quantity > 1 ? \n        `${item.description} (${item.quantity}x)` : item.description;\n      elementReview[`Regelitem ${i + 1} Prijs`] = item.price || 0;\n    } else {\n      elementReview[`Regelitem ${i + 1}`] = null;\n      elementReview[`Regelitem ${i + 1} Prijs`] = null;\n    }\n  }\n  \n  // KORTINGEN\n  elementReview[\"Element Korting\"] = pricing.totaalKortingen;\n  elementReview[\"Kortingen Detail\"] = pricing.kortingen.length > 0 ?\n    pricing.kortingen.map(k => `${k.description}: €${k.price}`).join('\\n') : null;\n  \n  // TOTALEN\n  elementReview[\"Element Subtotaal\"] = subtotal;\n  elementReview[\"Element Totaal\"] = subtotal ? (subtotal - pricing.totaalKortingen) : subtotal;\n  elementReview[\"Element BTW\"] = btw;\n  elementReview[\"Element Totaal Incl BTW\"] = totalIncl;\n  elementReview[\"Definitieve Element Prijs\"] = totalIncl;\n  \n  // STATUS\n  elementReview[\"Verkoop Review Status\"] = \"Concept\";\n  elementReview[\"Auto Cost Lookup Status\"] = \"Niet geprobeerd\";\n  elementReview[\"Review Notities\"] = isGekoppeld ? \"Gekoppeld element\" : null;\n  \n  // Clean nulls\n  const cleaned = {};\n  Object.keys(elementReview).forEach(key => {\n    const value = elementReview[key];\n    if (value !== null && value !== undefined && value !== '') {\n      cleaned[key] = typeof value === 'number' && \n        (key.includes('Prijs') || key.includes('Totaal') || \n         key.includes('BTW') || key.includes('Korting')) ? \n        Math.round(value * 100) / 100 : value;\n    }\n  });\n  \n  elementReviews.push(cleaned);\n});\n\nreturn elementReviews.map(element => ({ json: element }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -480
+      ],
+      "id": "5efc8f9a-2833-4b75-9c53-6f0940e218c0",
+      "name": "Elements Review Mapping"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pak de data uit de eerste node\nconst items = $input.all();\nconst data = items[0].json;\n\n// Parse helper\nconst parsePrice = (str) => {\n if (!str) return null;\n return parseFloat(str.replace(/\\./g, '').replace(',', '.'));\n};\n\n// Extract basis info\nconst opdrachtnummer = data.opdrachtnummer || \n                     data.filename?.replace(/^Offerte\\s*/, '').replace(/\\.pdf$/, '').trim() ||\n                     null;\n\n// Extract klantgegevens DYNAMISCH\nconst klantNaam = data.trimmedPdfText?.match(/Naam\\s+(.+)/)?.[1]?.trim() || null;\nconst klantAdres = data.trimmedPdfText?.match(/Adres\\s+(.+)/)?.[1]?.trim() || null;\nconst klantPostcode = data.trimmedPdfText?.match(/Postcode\\s+(.+)/)?.[1]?.trim() || null;\nconst klantStad = data.trimmedPdfText?.match(/Plaats\\s+(.+)/)?.[1]?.trim() || null;\nconst klantTelefoon = data.trimmedPdfText?.match(/Telefoon\\s+(.+)/)?.[1]?.trim() || null;\nconst klantEmail = data.trimmedPdfText?.match(/E-mail\\s+(.+)/)?.[1]?.trim() || null;\n\n// Tel totaal aantal elementen\nconst totalElements = data.merkElements ? data.merkElements.length : 0;\n\n// Bereken geschatte uren (18 minuten per element)\nconst estimatedMinutes = totalElements * 18;\nconst estimatedHours = Math.round((estimatedMinutes / 60) * 10) / 10;\n\n// Extract unieke locaties uit merkElements\nconst uniqueLocations = [...new Set(\n (data.merkElements || []).map(el => {\n   const location = el.body?.match(/Plaats\\s+(.+?)(?:\\n|$)/)?.[1]?.trim();\n   return location || 'Onbekend';\n })\n)].filter(loc => loc !== 'Onbekend');\n\n// Extract totaalbedrag uit summaryText\nconst totaalBedrag = data.summaryText?.match(/Totaal\\s+€\\s*([\\d.,]+)/)?.[1];\nconst grandTotal = totaalBedrag ? parsePrice(totaalBedrag) : null;\n\n// Maak elementen overzicht\nconst elementenOverzicht = (data.merkElements || []).map(el => {\n const elementType = el.body?.match(/Soort kozijn\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || \n                    el.body?.match(/Soort decoratie\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || \n                    'Onbekend';\n return `${el.header} (${elementType})`;\n}).join(' | ');\n\n// Bepaal provincie op basis van postcode (eerste 2 cijfers)\nconst provincie = klantPostcode ? klantPostcode.substring(0, 2) + 'xx' : null;\n\n// Verkoopdatum (vandaag of uit data)\nconst verkoopdatum = data.trimmedPdfText?.match(/Offerte datum\\s+(.+)/)?.[1]?.trim() || \n                   new Date().toISOString().split('T')[0];\n\n// Create Inmeetplanning record\nconst inmeetData = {\n // Primary identification\n \"Opdrachtnummer\": opdrachtnummer,\n \n // Main overview fields\n \"Klant & Stad\": klantNaam && klantStad ? `${klantNaam} - ${klantStad}` : null,\n \"Telefoon\": klantTelefoon,\n \"Elementen\": totalElements,\n \"Uren\": estimatedHours,\n \"Waarde\": grandTotal,\n \"Projectstatus\": \"Planning Vereist\",\n \n // Detailed customer information\n \"Klantnaam\": klantNaam,\n \"E-mail\": klantEmail,\n \"Volledig Adres\": [klantAdres, `${klantPostcode} ${klantStad}`].filter(Boolean).join('\\n') || null,\n \"Stad\": klantStad,\n \"Postcode\": klantPostcode,\n \"Provincie\": provincie,\n \n // Project details\n \"Opdracht verkocht op\": verkoopdatum,\n \"Total Amount Incl BTW\": grandTotal,\n \"Aantal Elementen\": totalElements,\n \"Elementen Overzicht\": elementenOverzicht || null,\n \"Locaties\": uniqueLocations.join(' | ') || null,\n \"Geschatte Uren\": estimatedHours,\n \"Planning Notities\": `Totaal elementen: ${totalElements} | Locaties: ${uniqueLocations.length} verschillende gebieden | Geschat: ${estimatedHours} uur (${estimatedMinutes} min)`,\n \"Uiterlijke montagedatum\": null\n};\n\n// Clean null values voor Airtable\nconst cleanedData = {};\nObject.keys(inmeetData).forEach(key => {\n if (inmeetData[key] !== null && inmeetData[key] !== undefined) {\n   cleanedData[key] = inmeetData[key];\n }\n});\n\nreturn [{ json: cleanedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "06f74e5c-9091-4075-8dc4-16354f7c19c9",
+      "name": "Project Administration Mapping"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pak de data uit de eerste node\nconst items = $input.all();\nconst data = items[0].json;\n\n// Parse helper\nconst parsePrice = (str) => {\n  if (!str) return null;\n  return parseFloat(str.replace(/\\./g, '').replace(',', '.'));\n};\n\n// Extract basis info\nconst opdrachtnummer = data.opdrachtnummer || \n                      data.filename?.replace(/^Offerte\\s*/, '').replace(/\\.pdf$/, '').trim() ||\n                      null;\n\n// Extract klantgegevens DYNAMISCH\nconst klantNaam = data.trimmedPdfText?.match(/Naam\\s+(.+)/)?.[1]?.trim() || null;\nconst klantAdres = data.trimmedPdfText?.match(/Adres\\s+(.+)/)?.[1]?.trim() || null;\nconst klantPostcode = data.trimmedPdfText?.match(/Postcode\\s+(.+)/)?.[1]?.trim() || null;\nconst klantStad = data.trimmedPdfText?.match(/Plaats\\s+(.+)/)?.[1]?.trim() || null;\nconst klantTelefoon = data.trimmedPdfText?.match(/Telefoon\\s+(.+)/)?.[1]?.trim() || null;\nconst klantEmail = data.trimmedPdfText?.match(/E-mail\\s+(.+)/)?.[1]?.trim() || null;\n\n// Extract totaalbedrag uit summaryText\nconst totaalMatch = data.summaryText?.match(/Totaal\\s+€\\s*([\\d.,]+)(?!.*Totaal)/s);\nconst totalAmount = totaalMatch ? parsePrice(totaalMatch[1]) : 0;\n\n// Bereken factuur bedragen (30%, 65%, 5%)\nconst voorafAmount = Math.round((totalAmount * 0.30) * 100) / 100;\nconst startAmount = Math.round((totalAmount * 0.65) * 100) / 100;\nconst opleveringAmount = Math.round((totalAmount * 0.05) * 100) / 100;\n\n// Maak volledig adres\nconst volledigAdres = [\n  klantAdres,\n  `${klantPostcode} ${klantStad}`\n].filter(Boolean).join('\\n') || null;\n\n// Maak factuur records - LET OP: geen dubbele spaties in Type Factuur!\nconst facturen = [\n  {\n    \"Factuur ID\": `${opdrachtnummer}-001`,\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Type Factuur\": \"30% - Vooraf\",\n    \"Bedrag\": voorafAmount,\n    \"Status\": \"Concept\",\n    \"Verstuurd op\": null,\n    \"Vervaldatum\": null,\n    \"Klant\": klantNaam,\n    \"Email\": klantEmail,\n    \"Telefoon\": klantTelefoon,\n    \"Adres\": volledigAdres\n  },\n  {\n    \"Factuur ID\": `${opdrachtnummer}-002`,\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Type Factuur\": \"65% - Start\",  // Geen dubbele spatie meer!\n    \"Bedrag\": startAmount,\n    \"Status\": \"Concept\",\n    \"Verstuurd op\": null,\n    \"Vervaldatum\": null,\n    \"Klant\": klantNaam,\n    \"Email\": klantEmail,\n    \"Telefoon\": klantTelefoon,\n    \"Adres\": volledigAdres\n  },\n  {\n    \"Factuur ID\": `${opdrachtnummer}-003`,\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Type Factuur\": \"5% - Oplevering\",\n    \"Bedrag\": opleveringAmount,\n    \"Status\": \"Concept\",\n    \"Verstuurd op\": null,\n    \"Vervaldatum\": null,\n    \"Klant\": klantNaam,\n    \"Email\": klantEmail,\n    \"Telefoon\": klantTelefoon,\n    \"Adres\": volledigAdres\n  }\n];\n\n// Return elk factuur als apart item voor Airtable batch processing\nreturn facturen.map(factuur => {\n  // Clean null values voor Airtable\n  const cleanedFactuur = {};\n  Object.keys(factuur).forEach(key => {\n    if (factuur[key] !== null && factuur[key] !== undefined) {\n      cleanedFactuur[key] = factuur[key];\n    }\n  });\n  return { json: cleanedFactuur };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        96
+      ],
+      "id": "0c3d2d05-45a7-4915-9713-d87797c56eaa",
+      "name": "Invoice Generation Mapping"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app9mz6mT0zk8XRGm",
+          "mode": "list",
+          "cachedResultName": "STB-Sales",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluQkxHv8zIemFUj",
+          "mode": "list",
+          "cachedResultName": "Deur Specificaties",
+          "cachedResultUrl": "https://airtable.com/app9mz6mT0zk8XRGm/tbluQkxHv8zIemFUj"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Opdrachtnummer",
+              "displayName": "Opdrachtnummer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element ID",
+              "displayName": "Element ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element ID Ref",
+              "displayName": "Element ID Ref",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Klantnaam",
+              "displayName": "Klantnaam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Element Type",
+              "displayName": "Element Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Locatie",
+              "displayName": "Locatie",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Geoffreerde Afmetingen",
+              "displayName": "Geoffreerde Afmetingen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Breedte (mm)",
+              "displayName": "Breedte (mm)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hoogte (mm)",
+              "displayName": "Hoogte (mm)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Model Deur",
+              "displayName": "Model Deur",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type Profiel",
+              "displayName": "Type Profiel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Verdiept",
+                  "value": "Verdiept"
+                },
+                {
+                  "name": "Verdiept HVL",
+                  "value": "Verdiept HVL"
+                },
+                {
+                  "name": "Vlak",
+                  "value": "Vlak"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type Kozijn",
+              "displayName": "Type Kozijn",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Stomp",
+                  "value": "Stomp"
+                },
+                {
+                  "name": "Aanslag",
+                  "value": "Aanslag"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Kleur Kozijn Binnen",
+              "displayName": "Kleur Kozijn Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Kleur Kozijn Buiten",
+              "displayName": "Kleur Kozijn Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Kleur Deurvleugel Binnen",
+              "displayName": "Kleur Deurvleugel Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Kleur Deurvleugel Buiten",
+              "displayName": "Kleur Deurvleugel Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Glas Deurvleugel",
+              "displayName": "Glas Deurvleugel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deurbeslag Buiten",
+              "displayName": "Deurbeslag Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deurbeslag Binnen",
+              "displayName": "Deurbeslag Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Staafgreep Specificatie",
+              "displayName": "Staafgreep Specificatie",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Scharnieren Binnen",
+              "displayName": "Scharnieren Binnen",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Scharnieren Buiten",
+              "displayName": "Scharnieren Buiten",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type Cilinder",
+              "displayName": "Type Cilinder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Cilinder Gelijksluitend",
+              "displayName": "Cilinder Gelijksluitend",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Ja",
+                  "value": "Ja"
+                },
+                {
+                  "name": "Nee",
+                  "value": "Nee"
+                },
+                {
+                  "name": "Ja, nieuwe set (regelt STB)",
+                  "value": "Ja, nieuwe set (regelt STB)"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Soort Onderdorpel",
+              "displayName": "Soort Onderdorpel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Brievenbus",
+              "displayName": "Brievenbus",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nee",
+                  "value": "Nee"
+                },
+                {
+                  "name": "RVS",
+                  "value": "RVS"
+                },
+                {
+                  "name": "Antraciet",
+                  "value": "Antraciet"
+                },
+                {
+                  "name": "Zwart",
+                  "value": "Zwart"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Afwatering",
+              "displayName": "Afwatering",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Onderkant",
+                  "value": "Onderkant"
+                },
+                {
+                  "name": "Voorkant",
+                  "value": "Voorkant"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Binnenafwerking",
+              "displayName": "Binnenafwerking",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Draairichting",
+              "displayName": "Draairichting",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Verkoop Review Status",
+              "displayName": "Verkoop Review Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Concept",
+                  "value": "Concept"
+                },
+                {
+                  "name": "Gecontroleerd",
+                  "value": "Gecontroleerd"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Opmerkingen voor Binnendienst",
+              "displayName": "Opmerkingen voor Binnendienst",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Definitieve Element Prijs",
+              "displayName": "Definitieve Element Prijs",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -288
+      ],
+      "id": "fd1b0f47-8d98-4052-8cce-1ff3378e32ec",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ax9Wtoz0YZou3bVH",
+          "name": "Airtable Personal Access Token STB-kozijnen Workspace"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node — Eén node, alles-in-één\n// Verwacht: items[0].json.fullPdfText (fallbacks: fullPDFtext, pdfText)\n\nconst raw =\n  (items[0].json.fullPdfText || items[0].json.fullPDFtext || items[0].json.pdfText || \"\")\n  .toString();\n\n// 0) Hard exit als leeg\nif (!raw.trim()) {\n  return [{ json: { error: \"Lege of ontbrekende fullPdfText\", trimmedPdfText: \"\", summaryText: \"\", merkElements: [] }}];\n}\n\n// 1) Normalisatie & snelle OCR-ruis opschoning\nlet text = raw\n  .replace(/\\u0000/g, \"\")                  // null-bytes\n  .replace(/\\r/g, \"\\n\")\n  .replace(/[ \\t]+/g, \" \")\n  .replace(/\\n{3,}/g, \"\\n\\n\")              // overbodige lege regels\n  .replace(/\\s+€/g, \" €\")                  // spatie-normalisatie voor euro\n  // euro-waarden waarin OCR letters aan eind plakt, bv \"€ 1.289,38ze\" -> \"€ 1.289,38\"\n  .replace(/€\\s*([\\d\\.\\,]+)[a-zA-Z]+/g, \"€ $1\")\n  // rare OCR-samenvoeging van “officiële” etc maakt ons niet uit\n  ;\n\n// 2) Werkwijze/FAQ-blok verwijderen, maar \"Samenvatting prijs\" behouden\n//   We knippen van \"Werkwijze STB[- ]?kozijnen\" t/m vlak vóór \"Samenvatt(ing|ende) prijs\"\nconst procBlock = /Werkwijze\\s*STB[-\\s]?kozijnen[\\s\\S]*?(?=Samenvatt(?:ing|ende)\\s+prijs)/i;\nconst hadProcedureBlock = procBlock.test(text);\nif (hadProcedureBlock) {\n  text = text.replace(procBlock, \"\"); // laat \"Samenvatting prijs\" staan\n}\n\n// Als het werkwijze-anker niet gevonden is, probeer ook een fallback op “Frequently Asked Questions”\nconst faqBlock = /Frequently\\s+Asked\\s+Questions[\\s\\S]*?(?=Samenvatt(?:ing|ende)\\s+prijs)/i;\nconst hadFaqBlock = faqBlock.test(text);\nif (!hadProcedureBlock && hadFaqBlock) {\n  text = text.replace(faqBlock, \"\");\n}\n\n// 3) Bepaal summary start (Samenvatting prijs) en knip summaryText uit\nlet summaryStartIdx = -1;\nlet summaryText = \"\";\n{\n  const sm = text.match(/Samenvatt(?:ing|ende)\\s+prijs/i);\n  if (sm) {\n    summaryStartIdx = sm.index;\n    summaryText = text.slice(summaryStartIdx).trim();\n  }\n}\n\n// 4) Trimmed tekst: hele document zonder werkwijze/FAQ, met eventuele summary intact\nconst trimmedPdfText = text.trim();\n\n// 5) Merk-blokken detecteren tot aan summary (zodat de samenvatting geen merk-blokken breekt)\nconst searchCeiling = summaryStartIdx > -1 ? summaryStartIdx : trimmedPdfText.length;\n\n// Merk-header: begin van regel, \"Merk\" + rest van de regel\nconst headerRegex = /(^|\\n)\\s*(Merk[^\\n]*)/gi;\nlet headers = [];\nlet m;\nwhile ((m = headerRegex.exec(trimmedPdfText)) !== null) {\n  const idx = m.index + (m[1] ? m[1].length : 0);\n  if (idx < searchCeiling) {\n    headers.push({ index: idx, text: m[2].trim() });\n  }\n}\n\n// Geen merk-headers? Dan geven we alsnog trimmed + summary terug\nif (!headers.length) {\n  return [{\n    json: {\n      trimmedPdfText,\n      summaryText,\n      merkElements: [],\n      _debug: {\n        hadProcedureBlock,\n        hadFaqBlock,\n        summaryFound: summaryStartIdx > -1\n      }\n    }\n  }];\n}\n\n// 6) Snij blokken tussen headers\nconst blocks = [];\nfor (let i = 0; i < headers.length; i++) {\n  const start = headers[i].index;\n  const end = (i < headers.length - 1)\n    ? Math.min(headers[i + 1].index, searchCeiling)\n    : searchCeiling;\n  blocks.push({\n    header: headers[i].text,\n    start,\n    end,\n    body: trimmedPdfText.slice(start, end).trim()\n  });\n}\n\n// Helpers voor header-analyse\nfunction extractDVariants(h) {\n  // pakt D1, D2, D3, etc. (maakt niet uit of er punten of streepjes tussen staan)\n  const variants = h.match(/\\b([A-Z]\\d+)\\b/g);\n  if (!variants || variants.length < 2) return null;\n  const firstLetter = variants[0][0];\n  const sameLetter = variants.every(v => v[0] === firstLetter);\n  if (!sameLetter) return null;\n  return { merkCode: firstLetter, variants: Array.from(new Set(variants)), coupled: true };\n}\n\nfunction extractMultiLetters(h) {\n  // “Merk B, C” -> [\"B\",\"C\"]\n  const m = h.match(/\\bMerk\\s+([A-Z](?:\\s*,\\s*[A-Z])+)\\b/i);\n  if (!m) return null;\n  return m[1].split(/\\s*,\\s*/).filter(Boolean);\n}\n\nfunction extractSingleLetter(h) {\n  const m = h.match(/\\bMerk\\s+([A-Z])\\b/);\n  return m ? m[1] : null;\n}\n\n// 7) Bouw merkElements met regels:\n//    - “Merk D1. D2.” -> één element (coupled: true, variants: [\"D1\",\"D2\"])\n//    - “Merk B, C” -> twee losse elementen (elk coupled: false)\n//    - “Merk B” -> één element\nconst merkElements = [];\n\nfor (const b of blocks) {\n  const cleanHeader = b.header.replace(/\\s+/g, \" \").trim();\n\n  // Case 1: D-varianten (één gekoppeld element)\n  const dRes = extractDVariants(cleanHeader);\n  if (dRes) {\n    merkElements.push({\n      header: `Merk ${dRes.variants.join(\". \")}`,\n      originalHeader: b.header,\n      merkCode: dRes.merkCode,\n      variants: dRes.variants,\n      coupled: true,\n      multiHeaderLettersSplit: false,\n      body: b.body\n    });\n    continue;\n  }\n\n  // Case 2: Meerdere letters in één header (B, C → 2 elementen)\n  const letters = extractMultiLetters(cleanHeader);\n  if (letters && letters.length > 1) {\n    letters.forEach(L => {\n      merkElements.push({\n        header: `Merk ${L}`,\n        originalHeader: b.header,\n        merkCode: L,\n        variants: [L],\n        coupled: false,\n        multiHeaderLettersSplit: true,\n        body: b.body\n      });\n    });\n    continue;\n  }\n\n  // Case 3: Enkelvoudige letter\n  const single = extractSingleLetter(cleanHeader);\n  if (single) {\n    merkElements.push({\n      header: `Merk ${single}`,\n      originalHeader: b.header,\n      merkCode: single,\n      variants: [single],\n      coupled: false,\n      multiHeaderLettersSplit: false,\n      body: b.body\n    });\n    continue;\n  }\n\n  // Fallback: onbekend patroon, geef door als-is\n  merkElements.push({\n    header: b.header,\n    originalHeader: b.header,\n    merkCode: null,\n    variants: [],\n    coupled: false,\n    multiHeaderLettersSplit: false,\n    body: b.body\n  });\n}\n\n// 8) Extra kleine opschoning op elke body (optioneel; helpt GPT):\nconst normalizeBody = (s) => s\n  .replace(/Pagina \\d+ van \\d+/gi, \"\")\n  .replace(/Omschrijving\\s+aantal/gi, \"Omschrijving Aantal\")\n  .replace(/\\n{3,}/g, \"\\n\\n\")\n  .trim();\n\nmerkElements.forEach(e => { e.body = normalizeBody(e.body); });\n\n// 9) Resultaat\nreturn [{\n  json: {\n    trimmedPdfText,\n    summaryText,\n    merkElements,\n    _debug: {\n      hadProcedureBlock,\n      hadFaqBlock,\n      summaryFound: summaryStartIdx > -1,\n      headersFound: headers.length,\n    }\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -384
+      ],
+      "id": "19527766-9c9b-4a27-90ae-01941fad4e55",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Probeer verschillende manieren om de vorige node te pakken\nconst items = $input.all();\nconst data = items[0].json;\n\n// Parse helper\nconst parsePrice = (str) => {\n if (!str) return null;\n return parseFloat(str.replace(/\\./g, '').replace(',', '.'));\n};\n\n// Extract opdrachtnummer - probeer uit data of filename\nconst opdrachtnummer = data.opdrachtnummer || \n                     data.filename?.replace(/^Offerte\\s*/, '').replace(/\\.pdf$/, '').trim() ||\n                     null; // Geen fallback, gewoon null als het niet gevonden wordt\n\nconst klantNaam = data.trimmedPdfText?.match(/Naam\\s+(.+)/)?.[1] || null;\nconst klantAdres = data.trimmedPdfText?.match(/Adres\\s+(.+)/)?.[1] || null;\nconst klantPostcode = data.trimmedPdfText?.match(/Postcode\\s+(.+)/)?.[1] || null;\nconst klantPlaats = data.trimmedPdfText?.match(/Plaats\\s+(.+)/)?.[1] || null;\nconst klantTelefoon = data.trimmedPdfText?.match(/Telefoon\\s+(.+)/)?.[1] || null;\nconst klantEmail = data.trimmedPdfText?.match(/E-mail\\s+(.+)/)?.[1] || null;\n\nconst subtotal = data.summaryText?.match(/Subtotaal\\s+€\\s+([\\d.,]+)/)?.[1];\nconst total = data.summaryText?.match(/Totaal\\s+€\\s+([\\d.,]+)/)?.[1];\n\nconst elementen = (data.merkElements || []).map(m => {\n const type = m.body?.match(/Soort kozijn\\s+(.+)/)?.[1] || 'Onbekend';\n const maat = m.body?.match(/(\\d+x\\d+mm)/)?.[1] || '';\n const prijs = m.body?.match(/Totaal\\s+€\\s+([\\d.,]+)/)?.[1] || '';\n return `${m.header}: ${type} ${maat} €${prijs}`;\n}).join('\\n');\n\nreturn [{\n json: {\n   \"Opdrachtnummer\": opdrachtnummer,\n   \"Klantnaam\": klantNaam,\n   \"Adres\": `${klantAdres || ''}\\n${klantPostcode || ''} ${klantPlaats || ''}`.trim(),\n   \"Telefoon\": klantTelefoon,\n   \"E-mail\": klantEmail,\n   \"Totaalprijs Excl BTW\": parsePrice(subtotal),\n   \"Totaalprijs Incl BTW\": parsePrice(total),\n   \"Offerte Elementen Overzicht\": elementen,\n   \"Verkoop Notities\": \"\"\n }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -864
+      ],
+      "id": "73c214bc-b0d5-4e46-bdbe-b31c07a938ce",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pak de data uit de eerste node\nconst items = $input.all();\nconst data = items[0].json;\n\n// Helper functies\nfunction mapElementType(type) {\n  if (!type) return 'Overig';\n  const t = type.toLowerCase();\n  \n  if (t.includes('achterdeur')) return 'Achterdeur';\n  if (t.includes('voordeur')) return 'Voordeur';\n  if (t.includes('schuif')) return 'Schuifpui';\n  if (t.includes('dakraam')) return 'Dakraam';\n  if (t.includes('vast raam')) return 'Kozijn';\n  if (t.includes('draaikiep')) return 'Kozijn';\n  if (t.includes('draai')) return 'Kozijn';\n  \n  return 'Overig';\n}\n\n// Extract basis info\nconst opdrachtnummer = data.opdrachtnummer || \n                      data.filename?.replace(/^Offerte\\s*/, '').replace(/\\.pdf$/, '').trim() ||\n                      `${Date.now()}_Onbekend`;\n\nconst klantNaam = data.trimmedPdfText?.match(/Naam\\s+(.+)/)?.[1]?.trim() || 'Onbekend';\nconst adres = data.trimmedPdfText?.match(/Adres\\s+(.+)/)?.[1]?.trim() || '';\nconst postcode = data.trimmedPdfText?.match(/Postcode\\s+(.+)/)?.[1]?.trim() || '';\nconst plaats = data.trimmedPdfText?.match(/Plaats\\s+(.+)/)?.[1]?.trim() || '';\nconst telefoon = data.trimmedPdfText?.match(/Telefoon\\s+(.+)/)?.[1]?.trim() || '';\nconst email = data.trimmedPdfText?.match(/E-mail\\s+(.+)/)?.[1]?.trim() || '';\n\n// Technische specs uit trimmedPdfText\nconst profielstijl = data.trimmedPdfText?.includes('met houtlookverbinding') \n  ? 'Verdiept, met houtlookverbinding' \n  : 'Verdiept, zonder houtlookverbinding';\n\nconst beglazing = data.trimmedPdfText?.includes('HR+++') \n  ? 'Hoog rendement isolatieglas HR+++ triple glas'\n  : 'HR++ dubbel glas';\n\n// Project record\nconst projectRecord = {\n  \"Opdrachtnummer\": opdrachtnummer,\n  \"Klant Naam\": klantNaam,\n  \"Adres\": adres,\n  \"Postcode\": postcode,\n  \"Plaats\": plaats,\n  \"Telefoon\": telefoon,\n  \"Email\": email,\n  \"Standaard Profielstijl\": profielstijl,\n  \"Standaard Beglazing\": beglazing,\n  \"Standaard Afstandhouders\": \"Aluminium\",\n  \"Standaard Kleur Kozijn Binnen\": \"Wit Houtnerfstructuur AP44\",\n  \"Standaard Kleur Vleugels Binnen\": \"Wit Houtnerfstructuur AP44\",\n  \"Standaard Kleur Kozijn Buiten\": \"Wit Houtnerfstructuur AP44\",\n  \"Standaard Kleur Vleugels Buiten\": \"Wit Houtnerfstructuur AP44\",\n  \"Verkocht op\": new Date().toISOString().split('T')[0],\n  \"Opmerkingen Project\": \"Automatisch aangemaakt uit PDF offerte\"\n};\n\n// Element records uit merkElements\nconst elementRecords = [];\n\n(data.merkElements || []).forEach(element => {\n  const body = element.body || '';\n  \n  // Extract gegevens uit element body\n  const elementType = body.match(/Soort kozijn\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || 'Onbekend';\n  const dimensions = body.match(/(\\d{3,4})x(\\d{3,4})mm/);\n  const location = body.match(/Plaats\\s+(.+?)(?:\\n|$)/)?.[1]?.trim() || '';\n  const totalPrice = body.match(/Totaal\\s+€\\s*([\\d.,]+)/)?.[1] || '0';\n  \n  const elementRecord = {\n    \"Opdrachtnummer\": opdrachtnummer,\n    \"Element ID (Merk)\": element.header.replace(/^Merk\\s*/i, '').trim(),\n    \"Soort Element\": mapElementType(elementType),\n    \"Plaats\": location,\n    \"Oorspronkelijke Breedte (mm)\": dimensions ? parseInt(dimensions[1]) : null,\n    \"Oorspronkelijke Hoogte (mm)\": dimensions ? parseInt(dimensions[2]) : null,\n    \"Draairichting\": elementType.includes('deur') ? \"Rechts binnendraaiend\" : \"Vast (geen)\",\n    \"Type Kozijn (Constructie)\": \"Stomp\",\n    \"Afwatering\": elementType.includes('deur') ? \"Onderkant\" : \"N.v.t.\",\n    \"Binnenafwerking Detail\": \"Kap 6\",\n    \"Inmeet Status\": \"Nog niet ingemeten\",\n    \"Prioriteit\": \"Normaal\",\n    \"Montage Notities (Inmeter)\": `${elementType} - Totaal: €${totalPrice}`,\n    \"Afwijkingen Notities\": \"\"\n  };\n  \n  elementRecords.push(elementRecord);\n});\n\n// Output voor Airtable\nconst outputs = [];\n\n// Voeg project record toe\noutputs.push({ json: projectRecord });\n\n// Voeg element records toe\nelementRecords.forEach(record => {\n  outputs.push({ json: record });\n});\n\nreturn outputs;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -672
+      ],
+      "id": "6d96bba2-07d7-4ac4-97c4-37f2fffc617e",
+      "name": "Code2"
+    }
+  ],
+  "pinData": {
+    "Elements Review Mapping": [
+      {
+        "json": {
+          "Opdrachtnummer": "STB-1757354172110",
+          "Element ID Ref": "A",
+          "Element ID": "A",
+          "Klantnaam": "Laura Nijssen",
+          "Element Type": "Draaikiep - vast raam",
+          "Locatie": "Begane grond zijgevel",
+          "Geoffreerde Afmetingen": "1600x1000mm",
+          "Breedte (mm)": 1600,
+          "Hoogte (mm)": 1000,
+          "Hoofdproduct": "Draaikiep - vast raam",
+          "Hoofdproduct Groep": "STB-KO-V",
+          "Hoofdproduct Prijs": 1288,
+          "Totaal Regelitems": 3,
+          "Totaal Regelitems Prijs": 3864,
+          "Alle Regelitems Detail": "Meerprijs afwijkende kleur / structuur: 1x €1288 = €1288\nHoutlookverbinding (HVL): 1x €1288 = €1288\nInsectenhor: 1x €1288 = €1288",
+          "Regelitem 1": "Meerprijs afwijkende kleur / structuur",
+          "Regelitem 1 Prijs": 1288,
+          "Regelitem 2": "Houtlookverbinding (HVL)",
+          "Regelitem 2 Prijs": 1288,
+          "Regelitem 3": "Insectenhor",
+          "Regelitem 3 Prijs": 1288,
+          "Element Korting": 0,
+          "Element Subtotaal": 1445,
+          "Element Totaal": 1445,
+          "Element Totaal Incl BTW": 1508.87,
+          "Definitieve Element Prijs": 1508.87,
+          "Verkoop Review Status": "Concept",
+          "Auto Cost Lookup Status": "Niet geprobeerd"
+        }
+      },
+      {
+        "json": {
+          "Opdrachtnummer": "STB-1757354172110",
+          "Element ID Ref": "B",
+          "Element ID": "B",
+          "Klantnaam": "Laura Nijssen",
+          "Element Type": "Draaistolp - draaikiep raam",
+          "Locatie": "Eerste verdieping achtergevel",
+          "Geoffreerde Afmetingen": "1570x1250mm",
+          "Breedte (mm)": 1570,
+          "Hoogte (mm)": 1250,
+          "Hoofdproduct": "Draaistolp - draaikiep raam",
+          "Hoofdproduct Groep": "STB-KO-DK",
+          "Hoofdproduct Prijs": 4981,
+          "Totaal Regelitems": 3,
+          "Totaal Regelitems Prijs": 14943,
+          "Alle Regelitems Detail": "Meerprijs afwijkende kleur / structuur: 1x €4981 = €4981\nHoutlookverbinding (HVL): 1x €4981 = €4981\nInsectenhor: 1x €4981 = €4981",
+          "Regelitem 1": "Meerprijs afwijkende kleur / structuur",
+          "Regelitem 1 Prijs": 4981,
+          "Regelitem 2": "Houtlookverbinding (HVL)",
+          "Regelitem 2 Prijs": 4981,
+          "Regelitem 3": "Insectenhor",
+          "Regelitem 3 Prijs": 4981,
+          "Element Korting": 0,
+          "Element BTW": 303.45,
+          "Element Totaal Incl BTW": 1748.45,
+          "Definitieve Element Prijs": 1748.45,
+          "Verkoop Review Status": "Concept",
+          "Auto Cost Lookup Status": "Niet geprobeerd"
+        }
+      },
+      {
+        "json": {
+          "Opdrachtnummer": "STB-1757354172110",
+          "Element ID Ref": "C",
+          "Element ID": "C",
+          "Klantnaam": "Laura Nijssen",
+          "Element Type": "Dubbele tuindeuren met zijlichten",
+          "Locatie": "Begane grond achtergevel",
+          "Geoffreerde Afmetingen": "4400x2400mm",
+          "Breedte (mm)": 4400,
+          "Hoogte (mm)": 2400,
+          "Hoofdproduct": "Dubbele tuindeuren met zijlichten",
+          "Hoofdproduct Prijs": 0,
+          "Totaal Regelitems": 3,
+          "Totaal Regelitems Prijs": 375,
+          "Alle Regelitems Detail": "Inclusief hardstenen onderdorpel: 2x €125 = €125\nInclusief hang- & sluitwerk: 2x €125 = €125\nInclusief veiligheidsglas: 2x €125 = €125",
+          "Regelitem 1": "Inclusief hardstenen onderdorpel (2x)",
+          "Regelitem 1 Prijs": 125,
+          "Regelitem 2": "Inclusief hang- & sluitwerk (2x)",
+          "Regelitem 2 Prijs": 125,
+          "Regelitem 3": "Inclusief veiligheidsglas (2x)",
+          "Regelitem 3 Prijs": 125,
+          "Element Korting": 0,
+          "Element Subtotaal": 6309.25,
+          "Element Totaal": 6309.25,
+          "Element BTW": 1324.94,
+          "Element Totaal Incl BTW": 7634.19,
+          "Definitieve Element Prijs": 7634.19,
+          "Verkoop Review Status": "Concept",
+          "Auto Cost Lookup Status": "Niet geprobeerd"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Inmeten": {
+      "main": [
+        []
+      ]
+    },
+    "Airtable Sales Klantgegevens": {
+      "main": [
+        []
+      ]
+    },
+    "Deur Specificaties Mapping": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Elements Review Mapping": {
+      "main": [
+        [
+          {
+            "node": "Airtable Elementen Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Administration Mapping": {
+      "main": [
+        [
+          {
+            "node": "Airtable Inmeten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Generation Mapping": {
+      "main": [
+        [
+          {
+            "node": "Airtable Facturatie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Elements Review Mapping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Project Administration Mapping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Invoice Generation Mapping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deur Specificaties Mapping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Airtable Sales Klantgegevens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Airtable Productie Klantgegevens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3086249e-8311-4523-9dd9-e99f8998bce7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d9180333bb70e1bc04809edaea0ae46e4bb0db815692ca6139746363fe3bf1ae"
+  },
+  "id": "7IZkVFUzPWFXj6w1",
+  "tags": []
+}

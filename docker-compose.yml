@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Redis for background job queue
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI server (webhook receiver)
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SERVER_PORT=8002
+      - OFFORTE_API_KEY=${OFFORTE_API_KEY}
+      - OFFORTE_ACCOUNT_NAME=${OFFORTE_ACCOUNT_NAME}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_STB_SALES=${AIRTABLE_BASE_STB_SALES}
+      - AIRTABLE_BASE_STB_ADMINISTRATIE=${AIRTABLE_BASE_STB_ADMINISTRATIE}
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: python3 -m backend.api.server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Background worker (proposal sync processor)
+  worker:
+    build: .
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - OFFORTE_API_KEY=${OFFORTE_API_KEY}
+      - OFFORTE_ACCOUNT_NAME=${OFFORTE_ACCOUNT_NAME}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_STB_SALES=${AIRTABLE_BASE_STB_SALES}
+      - AIRTABLE_BASE_STB_ADMINISTRATIE=${AIRTABLE_BASE_STB_ADMINISTRATIE}
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: python3 -m backend.workers.proposal_worker
+
+volumes:
+  redis-data:

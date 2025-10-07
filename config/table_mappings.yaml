@@ -1,0 +1,98 @@
+# Airtable Table Mapping Configuration
+# Defines how Offorte proposal data maps to Airtable tables
+
+tables:
+  klantenportaal:
+    description: "Customer portal - customer and contact information"
+    base: "administration"
+    key_field: "Offerte Nummer"
+    mappings:
+      "Bedrijfsnaam": "company.name"
+      "Adres": "company.street"
+      "Postcode": "company.zipcode"
+      "Plaats": "company.city"
+      "Email": "company.email"
+      "Telefoon": "company.phone"
+      "Contact Persoon": "contacts[0].name"
+      "Offerte Nummer": "proposal_nr"
+      "Status": "'Actief'"  # Static value
+
+  projecten:
+    description: "Projects - overall project administration"
+    base: "administration"
+    key_field: "Order Nummer"
+    mappings:
+      "Project Nummer": "proposal_nr"
+      "Naam": "name"
+      "Klant": "company.name"
+      "Totaal Bedrag": "total_price"
+      "Start Datum": "custom_fields.project_date"
+      "Eind Datum": "custom_fields.project_date + 60 days"
+      "Status": "'Gewonnen'"
+      "Verantwoordelijke": "account_user_name"
+      "Offorte ID": "id"
+
+  elementen_review:
+    description: "Element review - individual construction elements"
+    base: "sales"
+    key_field: "Element ID"
+    source: "elements"  # Use parsed elements list
+    mappings:
+      "Order Nummer": "proposal_nr"
+      "Element ID": "element_id"
+      "Type": "type"
+      "Merk": "brand"
+      "Locatie": "location"
+      "Breedte (mm)": "width_mm"
+      "Hoogte (mm)": "height_mm"
+      "Gekoppeld": "coupled"
+      "Variant": "variant"
+      "Prijs": "price"
+      "Opmerkingen": "notes"
+
+  inmeetplanning:
+    description: "Measurement planning - scheduling with time calculations"
+    base: "technical"
+    key_field: "Order Nummer"
+    mappings:
+      "Order Nummer": "proposal_nr"
+      "Klant": "company.name"
+      "Aantal Elementen": "len(elements)"
+      "Geschatte Tijd (min)": "len(elements) * 18"
+      "Geplande Datum": "null"  # Manual assignment
+      "Status": "'Te plannen'"
+      "Toegewezen aan": "null"
+
+  facturatie:
+    description: "Invoicing - 3 invoice splits (30/65/5)"
+    base: "administration"
+    key_field: "Order Nummer"
+    transformation: "invoice_splits"  # Special transformation function
+    splits:
+      - type: "30% - Vooraf"
+        percentage: 0.30
+        date_offset: 0
+        status: "Concept"
+      - type: "65% - Start"
+        percentage: 0.65
+        date_offset: 14
+        status: "Gepland"
+      - type: "5% - Oplevering"
+        percentage: 0.05
+        date_offset: 74
+        status: "Gepland"
+
+  deur_specificaties:
+    description: "Door specifications - door-specific technical details"
+    base: "technical"
+    key_field: "Order Nummer"
+    source: "elements"  # Filter for door elements only
+    filter: "type contains 'deur'"
+    mappings:
+      "Order Nummer": "proposal_nr"
+      "Deur Type": "type"
+      "Model": "notes.extract('model')"  # TODO: Implement extraction
+      "Kleur": "notes.extract('color')"
+      "Glastype": "notes.extract('glass')"
+      "Sluitwerk": "notes.extract('locks')"
+      "Speciale Kenmerken": "notes"
