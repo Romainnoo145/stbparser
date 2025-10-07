@@ -69,7 +69,9 @@
       "Bash(ssh-keygen:*)",
       "Bash(ssh-add:*)",
       "Read(//c/Users/rtlka/.ssh/**)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)"
     ],
     "deny": []
   }
