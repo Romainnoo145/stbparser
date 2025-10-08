@@ -35,9 +35,9 @@ class Settings(BaseSettings):
     airtable_base_stb_productie: str = Field(..., alias="airtable_base_stb-productie", description="STB Productie base ID")
     airtable_rate_limit: int = Field(default=5, description="Airtable requests per second")
 
-    # LLM Configuration
+    # LLM Configuration (Optional - only needed for AI agent features)
     llm_provider: str = Field(default="openai", description="LLM provider")
-    llm_api_key: str = Field(..., description="API key for the LLM provider")
+    llm_api_key: str = Field(default="not-configured", description="API key for the LLM provider")
     llm_model: str = Field(default="gpt-4o", description="Model name to use")
     llm_base_url: str = Field(
         default="https://api.openai.com/v1",
@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     )
 
     # Server Configuration
-    webhook_secret: str = Field(..., description="Webhook validation secret")
+    webhook_secret: str = Field(default="change-this-secret", description="Webhook validation secret")
     server_port: int = Field(default=8000, description="Server port")
     server_host: str = Field(default="0.0.0.0", description="Server host")
 
