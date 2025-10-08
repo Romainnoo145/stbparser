@@ -17,10 +17,9 @@ services:
   api:
     build: .
     restart: unless-stopped
-    expose:
-      - "8002"
+    ports:
+      - "127.0.0.1:8002:8002"
     environment:
-      - SERVICE_FQDN_API_8002=https://stbparser.klarifai.nl
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
       - OFFORTE_API_KEY=${OFFORTE_API_KEY}
