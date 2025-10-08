@@ -19,6 +19,13 @@ services:
     restart: unless-stopped
     ports:
       - "8002:8002"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`stbparser.klarifai.nl`)"
+      - "traefik.http.routers.api.entrypoints=https"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.api.loadbalancer.server.port=8002"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
