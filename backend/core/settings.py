@@ -30,9 +30,9 @@ class Settings(BaseSettings):
 
     # Airtable Configuration
     airtable_api_key: str = Field(..., description="Airtable API key")
-    airtable_base_stb_administratie: str = Field(..., alias="airtable_base_stb-administratie", description="STB Administratie base ID")
-    airtable_base_stb_sales: str = Field(..., alias="airtable_base_stb-sales", description="STB Sales base ID")
-    airtable_base_stb_productie: str = Field(..., alias="airtable_base_stb-productie", description="STB Productie base ID")
+    airtable_base_stb_administratie: str = Field(..., description="STB Administratie base ID")
+    airtable_base_stb_sales: str = Field(..., description="STB Sales base ID")
+    airtable_base_stb_productie: str = Field(default="dummy", description="STB Productie base ID (not used)")
     airtable_rate_limit: int = Field(default=5, description="Airtable requests per second")
 
     # LLM Configuration (Optional - only needed for AI agent features)
