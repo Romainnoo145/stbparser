@@ -20,10 +20,11 @@ services:
     expose:
       - "8002"
     labels:
-      - "coolify.managed=true"
-      - "coolify.name=api"
-      - "coolify.http.enabled=true"
-      - "coolify.http.port=8002"
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-cosgkw88cogc0sw4s8o4ogkg.rule=Host(`stbparser.klarifai.nl`)"
+      - "traefik.http.routers.api-cosgkw88cogc0sw4s8o4ogkg.entrypoints=https"
+      - "traefik.http.routers.api-cosgkw88cogc0sw4s8o4ogkg.tls=true"
+      - "traefik.http.services.api-cosgkw88cogc0sw4s8o4ogkg.loadbalancer.server.port=8002"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
