@@ -17,8 +17,8 @@ services:
   api:
     build: .
     restart: unless-stopped
-    ports:
-      - "8002:8002"
+    expose:
+      - "8002"
     labels:
       - "coolify.managed=true"
       - "coolify.name=api"
