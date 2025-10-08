@@ -19,6 +19,11 @@ services:
     restart: unless-stopped
     ports:
       - "8002:8002"
+    labels:
+      - "coolify.managed=true"
+      - "coolify.name=api"
+      - "coolify.http.enabled=true"
+      - "coolify.http.port=8002"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
