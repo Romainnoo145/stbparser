@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Redis for background job queue
   redis:
@@ -13,24 +11,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # Caddy reverse proxy with automatic HTTPS
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - caddy-data:/data
-      - caddy-config:/config
-    environment:
-      - DOMAIN=stbparser.klarifai.nl
-    command: caddy reverse-proxy --from https://stbparser.klarifai.nl --to http://api:8002
-
   # FastAPI server (webhook receiver)
   api:
     build: .
     restart: unless-stopped
+    ports:
+      - "8002:8002"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
@@ -64,9 +50,7 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    command: python3 -m backend.workers.proposal_worker
+    command: celery -A backend.workers.worker worker --loglevel=info
 
 volumes:
   redis-data:
-  caddy-data:
-  caddy-config:
