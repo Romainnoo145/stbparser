@@ -12,6 +12,7 @@ import redis.asyncio as redis
 
 from backend.core.settings import settings
 from backend.agent.tools import validate_webhook
+from backend.workers.worker import sync_proposal_task
 
 app = FastAPI(
     title="Offorte-Airtable Sync Server",
@@ -105,19 +106,14 @@ async def receive_webhook(request: Request):
 
         # Queue for background processing (only for proposal_won events)
         if event_type == "proposal_won":
-            job_data = {
-                "proposal_id": proposal_id,
-                "event": event_type,
-                "timestamp": datetime.now().isoformat(),
-                "raw_payload": payload
-            }
-
-            await redis_client.rpush("sync_queue", json.dumps(job_data))
-            logger.info(f"Queued proposal {proposal_id} for sync")
+            # Trigger Celery task directly
+            task = sync_proposal_task.delay(proposal_id)
+            logger.info(f"Triggered Celery task {task.id} for proposal {proposal_id}")
 
             return {
                 "status": "accepted",
                 "proposal_id": proposal_id,
+                "task_id": task.id,
                 "queued": True
             }
 
