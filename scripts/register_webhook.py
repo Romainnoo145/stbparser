@@ -25,7 +25,7 @@ webhook_url = sys.argv[1] if len(sys.argv) > 1 else "https://noted-symphonically
 
 # Try to register webhook
 webhook_payload = {
-    "url": webhook_url,
+    "payload_url": webhook_url,
     "events": ["proposal_won"]
 }
 
