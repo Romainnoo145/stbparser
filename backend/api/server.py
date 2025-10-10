@@ -145,6 +145,34 @@ async def queue_status():
         return {"error": str(e)}
 
 
+@app.post("/test/sync/{proposal_id}")
+async def test_sync(proposal_id: int):
+    """
+    Test endpoint to manually trigger sync for a proposal.
+
+    Usage: POST to /test/sync/299654
+    """
+    try:
+        logger.info(f"Manual test sync triggered for proposal {proposal_id}")
+
+        # Trigger Celery task
+        task = sync_proposal_task.delay(proposal_id)
+        logger.info(f"Celery task {task.id} queued for proposal {proposal_id}")
+
+        return {
+            "status": "success",
+            "proposal_id": proposal_id,
+            "task_id": task.id,
+            "message": f"Sync task queued. Check worker logs for task {task.id}"
+        }
+    except Exception as e:
+        logger.error(f"Test sync failed: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
