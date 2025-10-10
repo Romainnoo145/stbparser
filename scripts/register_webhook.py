@@ -3,20 +3,25 @@
 
 import requests
 import json
+import sys
+import os
 from urllib.parse import quote
-from backend.core.settings import settings
+from dotenv import load_dotenv
 
-# Offorte API configuration
-account_name = quote(settings.offorte_account_name)
-api_key = settings.offorte_api_key
+# Load environment variables
+load_dotenv()
+
+# Offorte API configuration (directly from env to avoid full settings validation)
+account_name = quote(os.getenv("OFFORTE_ACCOUNT_NAME"))
+api_key = os.getenv("OFFORTE_API_KEY")
 base_url = f"https://connect.offorte.com/api/v2/{account_name}"
 
 headers = {
     "Content-Type": "application/json"
 }
 
-# Your public webhook URL
-webhook_url = "https://ten-worlds-enter.loca.lt/webhook/offorte"
+# Get webhook URL from command line or use default
+webhook_url = sys.argv[1] if len(sys.argv) > 1 else "https://noted-symphonically-han.ngrok-free.dev/webhook/offorte"
 
 # Try to register webhook
 webhook_payload = {

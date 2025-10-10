@@ -17,6 +17,11 @@ services:
     restart: unless-stopped
     ports:
       - "8002:8002"
+    labels:
+      - "coolify.managed=true"
+      - "coolify.type=application"
+      - "coolify.domain=stbparser.klarifai.nl"
+      - "coolify.port=8002"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8002
