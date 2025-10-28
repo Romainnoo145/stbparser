@@ -13,81 +13,13 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from loguru import logger
 
-
-def extract_specs_from_html(html_content: str) -> Dict[str, str]:
-    """
-    Extract technical specifications from HTML bullet points.
-
-    Args:
-        html_content: HTML string with <ul><li> structure
-
-    Returns:
-        Dictionary of extracted specs
-    """
-    if not html_content:
-        return {}
-
-    soup = BeautifulSoup(html_content, 'html.parser')
-    specs = {}
-
-    # Find all bullet points
-    list_items = soup.find_all('li')
-
-    for li in list_items:
-        text = li.get_text(strip=True).lower()
-
-        # Glas detection
-        if 'glas' in text or 'beglazing' in text:
-            specs['glas_detail'] = li.get_text(strip=True)
-
-        # Kleur detection
-        if 'kleur' in text or 'ral' in text:
-            if 'binnen' in text:
-                specs['kleur_binnen'] = li.get_text(strip=True)
-            elif 'buiten' in text:
-                specs['kleur_buiten'] = li.get_text(strip=True)
-            else:
-                specs['kleur_kozijn'] = li.get_text(strip=True)
-
-        # Draairichting
-        if 'draairichting' in text or 'openslaand' in text:
-            if 'links' in text:
-                specs['draairichting'] = 'Links'
-            elif 'rechts' in text:
-                specs['draairichting'] = 'Rechts'
-
-        # Afmetingen
-        if 'afmet' in text or 'maat' in text or 'mm' in text:
-            specs['geoffreerde_afmetingen'] = li.get_text(strip=True)
-
-        # Hordeur detection
-        if 'hordeur' in text:
-            specs['heeft_hordeuren'] = True
-
-    return specs
-
-
-def determine_element_type(product_name: str, description: str) -> str:
-    """
-    Determine element type from product name and description.
-
-    Returns:
-        One of: Deur, Raam, Kozijn, Schuifpui, Vouwwand, Overig
-    """
-    combined = (product_name + " " + description).lower()
-
-    if 'deur' in combined:
-        return 'Deur'
-    elif 'raam' in combined:
-        return 'Raam'
-    elif 'schuif' in combined:
-        return 'Schuifpui'
-    elif 'vouw' in combined:
-        return 'Vouwwand'
-    elif 'kozijn' in combined:
-        return 'Kozijn'
-    else:
-        return 'Overig'
+# Import enhanced parser functions
+from backend.transformers.specs_parser import (
+    extract_specs_from_pricetable,
+    extract_dimensions_from_text,
+    extract_product_name_clean,
+    determine_element_type_enhanced
+)
 
 
 def transform_proposal_to_klantenportaal(proposal_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -178,22 +110,24 @@ def transform_pricetable_to_element(
     # Generate Element ID: {proposal_id}-E{element_index+1}
     element_id = f"{proposal_id}-E{element_index + 1}"
 
-    # Extract specs from HTML content
+    # Extract specs from ENTIRE pricetable (main + subproducts)
+    specs = extract_specs_from_pricetable(pricetable)
+
+    # Extract product name and dimensions from main row
     html_content = main_row.get('content', '')
-    specs = extract_specs_from_html(html_content)
+    product_name = specs.get('product_name', '')
 
-    # Determine element type
-    # Webhook data has 'content' (HTML), not 'product_name'/'description'
-    product_name = main_row.get('product_name', '')
-    description = main_row.get('description', '')
-
-    # If no product_name, extract from HTML content
+    # If no product name extracted, fall back to original method
     if not product_name:
-        from bs4 import BeautifulSoup
-        soup = BeautifulSoup(html_content, 'html.parser')
-        product_name = soup.get_text(strip=True)[:100]  # First 100 chars
+        product_name = main_row.get('product_name', '')
+        if not product_name:
+            product_name = extract_product_name_clean(html_content)
 
-    element_type = determine_element_type(product_name, html_content)
+    # Determine element type using enhanced detection
+    element_type = determine_element_type_enhanced(product_name, html_content)
+
+    # Get description from specs or main row
+    description = main_row.get('description', '')
 
     # Calculate pricing
     main_price = float(main_row.get('price', 0))
@@ -260,7 +194,7 @@ def transform_pricetable_to_specs(
     customer_name: str
 ) -> Dict[str, Any]:
     """
-    Transform pricetable first row into Element Specificaties record.
+    Transform pricetable into Element Specificaties record with enhanced parsing.
 
     Args:
         pricetable: Pricetable data from Offorte
@@ -275,16 +209,30 @@ def transform_pricetable_to_specs(
     if not rows:
         return {}
 
+    # Extract ALL specs from entire pricetable (main + subproducts)
+    specs = extract_specs_from_pricetable(pricetable)
+
     main_row = rows[0]
-
-    # Extract specs from HTML
     html_content = main_row.get('content', '')
-    specs = extract_specs_from_html(html_content)
 
-    # Determine element type
-    product_name = main_row.get('product_name', '')
-    description = main_row.get('description', '')
-    element_type = determine_element_type(product_name, description)
+    # Get product name from specs or fallback to main row
+    product_name = specs.get('product_name', '')
+    if not product_name:
+        product_name = main_row.get('product_name', '')
+        if not product_name:
+            product_name = extract_product_name_clean(html_content)
+
+    # Determine element type using enhanced detection
+    element_type = determine_element_type_enhanced(product_name, html_content)
+
+    # Extract dimensions with proper formatting
+    afmetingen = specs.get('geoffreerde_afmetingen', '')
+    breedte = specs.get('breedte')
+    hoogte = specs.get('hoogte')
+
+    # Build dimensions string if we have structured data
+    if not afmetingen and breedte and hoogte:
+        afmetingen = f"{breedte}x{hoogte} mm"
 
     return {
         "Element ID Ref": element_id,
@@ -297,9 +245,12 @@ def transform_pricetable_to_specs(
         "Locatie": "",  # Not available in Offorte
 
         # Afmetingen
-        "Geoffreerde Afmetingen": specs.get('geoffreerde_afmetingen', ''),
+        "Geoffreerde Afmetingen": afmetingen,
+        "Breedte": breedte,
+        "Hoogte": hoogte,
 
         # Glas
+        "Glas Type": specs.get('glas_type', ''),
         "Glas Detail": specs.get('glas_detail', ''),
 
         # Kleur
@@ -309,6 +260,9 @@ def transform_pricetable_to_specs(
 
         # Deur
         "Draairichting": specs.get('draairichting', ''),
+
+        # Extra Options
+        "Extra Opties": specs.get('extra_opties', ''),
 
         # Review
         "Verkoop Review Status": "In Review",
