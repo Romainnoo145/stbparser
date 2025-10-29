@@ -20,6 +20,8 @@ from backend.transformers.specs_parser import (
     extract_product_name_clean,
     determine_element_type_enhanced
 )
+# Import LLM-based extractor for high-precision spec extraction
+from backend.transformers.llm_spec_extractor import extract_specs_with_llm
 
 
 def transform_proposal_to_klantenportaal(proposal_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -187,7 +189,10 @@ def transform_pricetable_to_specs(
     customer_name: str
 ) -> Dict[str, Any]:
     """
-    Transform pricetable into Element Specificaties record with enhanced parsing.
+    Transform pricetable into Element Specificaties record with LLM-based extraction.
+
+    Uses OpenAI GPT-4 for high-precision spec extraction from Offorte HTML.
+    Handles variations in HTML structure, Dutch language, and product-specific fields.
 
     Args:
         pricetable: Pricetable data from Offorte
@@ -202,30 +207,33 @@ def transform_pricetable_to_specs(
     if not rows:
         return {}
 
-    # Extract ALL specs from entire pricetable (main + subproducts)
-    specs = extract_specs_from_pricetable(pricetable)
-
     main_row = rows[0]
     html_content = main_row.get('content', '')
 
-    # Get product name from specs or fallback to main row
-    product_name = specs.get('product_name', '')
-    if not product_name:
-        product_name = main_row.get('product_name', '')
-        if not product_name:
-            product_name = extract_product_name_clean(html_content)
-
-    # Determine element type using enhanced detection
+    # First, determine element type using pattern-based detection (fast)
+    product_name = extract_product_name_clean(html_content)
     element_type = determine_element_type_enhanced(product_name, html_content)
 
-    # Extract dimensions with proper formatting
-    afmetingen = specs.get('geoffreerde_afmetingen', '')
+    # Extract ALL specs using LLM (high precision)
+    logger.info(f"Using LLM to extract specs for {element_type}: {product_name}")
+    specs = extract_specs_with_llm(pricetable, element_type)
+
+    # Use LLM-extracted product name if available
+    if specs.get('product_name'):
+        product_name = specs['product_name']
+
+    # Extract dimensions from LLM response
+    afmetingen = specs.get('geoffreerde_afmetingen', 'N.v.t')
     breedte = specs.get('breedte')
     hoogte = specs.get('hoogte')
 
-    # Build dimensions string if we have structured data
-    if not afmetingen and breedte and hoogte:
-        afmetingen = f"{breedte}x{hoogte} mm"
+    # Helper to get value or N.v.t
+    def get_or_nvt(field_name: str) -> str:
+        """Get spec value or 'N.v.t' if empty/missing."""
+        value = specs.get(field_name)
+        if value and str(value).strip() and str(value).lower() != 'null':
+            return str(value)
+        return "N.v.t"
 
     return {
         "Element ID Ref": element_id,
@@ -235,43 +243,43 @@ def transform_pricetable_to_specs(
         # Context
         "Element Type": element_type,
         "Element Naam": product_name,
-        "Locatie": "",  # Not available in Offorte
+        "Locatie": get_or_nvt('locatie'),
 
         # Afmetingen - Use correct field names from Airtable
-        "Geoffreerde Afmetingen": afmetingen,
+        "Geoffreerde Afmetingen": afmetingen if afmetingen != 'N.v.t' else "N.v.t",
         "Breedte (mm)": breedte,
         "Hoogte (mm)": hoogte,
 
         # Glas
-        "Glas Type": specs.get('glas_type', ''),
-        "Glas Detail": specs.get('glas_detail', ''),
+        "Glas Type": get_or_nvt('glas_type'),
+        "Glas Detail": get_or_nvt('glas_detail'),
 
         # Kleur
-        "Kleur Kozijn": specs.get('kleur_kozijn', ''),
-        "Kleur Binnen": specs.get('kleur_binnen', ''),
-        "Kleur Buiten": specs.get('kleur_buiten', ''),
+        "Kleur Kozijn": get_or_nvt('kleur_kozijn'),
+        "Kleur Binnen": get_or_nvt('kleur_binnen'),
+        "Kleur Buiten": get_or_nvt('kleur_buiten'),
 
         # Deur specifiek
-        "Draairichting": specs.get('draairichting', ''),
+        "Draairichting": get_or_nvt('draairichting'),
 
-        # Beslag/Hardware (NEW!)
-        "Deurbeslag Binnen": specs.get('deurbeslag_binnen', ''),
-        "Deurbeslag Buiten": specs.get('deurbeslag_buiten', ''),
-        "Staafgreep Specificatie": specs.get('staafgreep_specificatie', ''),
-        "Scharnieren Type": specs.get('scharnieren_type', ''),
-        "Type Cilinder": specs.get('type_cilinder', ''),
-        "Cilinder Gelijksluitend": specs.get('cilinder_gelijksluitend', ''),
+        # Beslag/Hardware
+        "Deurbeslag Binnen": get_or_nvt('deurbeslag_binnen'),
+        "Deurbeslag Buiten": get_or_nvt('deurbeslag_buiten'),
+        "Staafgreep Specificatie": get_or_nvt('staafgreep_specificatie'),
+        "Scharnieren Type": get_or_nvt('scharnieren_type'),
+        "Type Cilinder": get_or_nvt('type_cilinder'),
+        "Cilinder Gelijksluitend": get_or_nvt('cilinder_gelijksluitend'),
 
-        # Dorpel/Onderdelen (NEW!)
-        "Soort Onderdorpel": specs.get('soort_onderdorpel', ''),
-        "Brievenbus": specs.get('brievenbus', ''),
-        "Afwatering": specs.get('afwatering', ''),
+        # Dorpel/Onderdelen
+        "Soort Onderdorpel": get_or_nvt('soort_onderdorpel'),
+        "Brievenbus": get_or_nvt('brievenbus'),
+        "Afwatering": get_or_nvt('afwatering'),
 
-        # Overig (NEW!)
-        "Binnenafwerking": specs.get('binnenafwerking', ''),
+        # Overig
+        "Binnenafwerking": get_or_nvt('binnenafwerking'),
 
         # Extra Options
-        "Extra Opties": specs.get('extra_opties', ''),
+        "Extra Opties": get_or_nvt('extra_opties'),
 
         # Review
         "Verkoop Review Status": "In Review",
@@ -298,6 +306,8 @@ def transform_pricetable_rows_to_subproducten(
     Returns:
         List of dictionaries for Subproducten table
     """
+    from bs4 import BeautifulSoup
+
     rows = pricetable.get('rows', [])
     if len(rows) <= 1:
         return []  # No subproducten
@@ -306,8 +316,20 @@ def transform_pricetable_rows_to_subproducten(
 
     # Skip first row (that's the hoofdproduct)
     for idx, row in enumerate(rows[1:], start=1):
-        product_name = row.get('product_name', '')
-        description = row.get('description', '')
+        # Parse HTML content from Offorte API
+        html_content = row.get('content', '')
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Extract product name from first <p> tag
+        first_p = soup.find('p')
+        product_name = first_p.get_text(strip=True) if first_p else 'N.v.t'
+
+        # Description: any additional text or <li> items
+        description = ''
+        li_items = soup.find_all('li')
+        if li_items:
+            description = '\n'.join([li.get_text(strip=True) for li in li_items])
+
         price = float(row.get('price', 0))
         quantity = int(row.get('quantity', 1))
         subtotal = price * quantity
@@ -318,33 +340,35 @@ def transform_pricetable_rows_to_subproducten(
         # Determine subproduct category and type
         # Subproduct Categorie: what kind of product (Kleur, Glas, Beslag, Hordeur, etc.)
         # Subproduct Type: pricing nature (Meerprijs, Optie, Accessoire, Korting)
-        category = None
         product_lower = product_name.lower()
         description_lower = description.lower()
+        combined_text = f"{product_lower} {description_lower}"
 
-        # Determine category
-        if 'kleur' in product_lower or 'ral' in product_lower:
+        # Determine category with improved keyword matching
+        if any(word in combined_text for word in ['kleur', 'ral', 'afwijkend', 'coating']):
             category = "Kleur"
-        elif 'glas' in product_lower or 'beglazing' in product_lower:
+        elif any(word in combined_text for word in ['glas', 'beglazing', 'glazen', 'melkglas', 'gezandstraald']):
             category = "Glas"
-        elif 'beslag' in product_lower or 'greep' in product_lower or 'cilinder' in product_lower:
+        elif any(word in combined_text for word in ['beslag', 'greep', 'cilinder', 'knop', 'staafgreep', 'deurgreep', 'sluitwerk', 'hang-']):
             category = "Beslag"
-        elif 'hordeur' in product_lower:
+        elif 'hordeur' in combined_text:
             category = "Hordeur"
-        elif 'dorpel' in product_lower:
+        elif any(word in combined_text for word in ['dorpel', 'onderdorpel']):
             category = "Dorpel"
-        elif 'ventilatie' in product_lower or 'rooster' in product_lower:
+        elif any(word in combined_text for word in ['ventilatie', 'rooster']):
             category = "Ventilatie"
+        elif any(word in combined_text for word in ['brievenbus', 'kozijnverbreding', 'demonteren', 'monteren']):
+            category = "Accessoire"
         else:
             category = "Anders"
 
         # Determine type (most Offorte items are meerprijs/options)
         subproduct_type = "Meerprijs"  # Default
-        if 'korting' in product_lower or 'afprijzing' in product_lower or price < 0:
+        if 'korting' in combined_text or 'afprijzing' in combined_text or price < 0:
             subproduct_type = "Korting"
-        elif 'optie' in product_lower or 'extra' in product_lower:
+        elif 'optie' in combined_text or 'extra' in combined_text:
             subproduct_type = "Optie"
-        elif 'accessoire' in product_lower:
+        elif 'accessoire' in combined_text or 'brievenbus' in combined_text or 'demonteren' in combined_text:
             subproduct_type = "Accessoire"
 
         subproducten.append({
@@ -356,7 +380,7 @@ def transform_pricetable_rows_to_subproducten(
             # Subproduct Info
             "Subproduct Type": subproduct_type,  # Meerprijs, Optie, Accessoire, Korting
             "Subproduct Naam": product_name,
-            "Subproduct Beschrijving": description,
+            "Subproduct Beschrijving": description if description else None,
             "Subproduct Categorie": category,  # Kleur, Glas, Beslag, etc.
             "Bron": "Offorte",
 
