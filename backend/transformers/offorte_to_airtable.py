@@ -22,6 +22,8 @@ from backend.transformers.specs_parser import (
 )
 # Import LLM-based extractor for high-precision spec extraction
 from backend.transformers.llm_spec_extractor import extract_specs_with_llm
+# Import technical specification defaults
+from backend.transformers.tech_spec_defaults import apply_tech_spec_defaults, check_for_overrides
 
 
 def transform_proposal_to_klantenportaal(proposal_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -217,6 +219,12 @@ def transform_pricetable_to_specs(
     # Extract ALL specs using LLM (high precision)
     logger.info(f"Using LLM to extract specs for {element_type}: {product_name}")
     specs = extract_specs_with_llm(pricetable, element_type)
+
+    # Apply default technical specifications for N.v.t fields
+    specs = apply_tech_spec_defaults(specs)
+
+    # Check for overrides in extra options (e.g., Triple glas overrides HR++ default)
+    specs = check_for_overrides(specs, specs.get('extra_opties', ''))
 
     # Use LLM-extracted product name if available
     if specs.get('product_name'):
