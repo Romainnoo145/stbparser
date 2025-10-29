@@ -133,38 +133,42 @@ Extract the following fields (return JSON). Use "N.v.t" if a field is not mentio
   "geoffreerde_afmetingen": "Full dimension string like '2450x1760 mm' or 'N.v.t'",
   "breedte": numeric width in mm or null,
   "hoogte": numeric height in mm or null,
-  "locatie": "Location/room if mentioned, else 'N.v.t'",
+  "locatie": "Location/room (e.g. 'Slaapkamer', 'Woonkamer', 'Zolder'). Look for 'Plaats:' or room names after dimensions. Use 'N.v.t' if not mentioned.",
 
   "glas_type": "One of: Triple, HR++, HR+++, Veiligheidsglas, Dubbelglas, Anders, or 'N.v.t'",
-  "glas_detail": "Glass details/description or 'N.v.t'",
 
-  "kleur_kozijn": "Frame color (RAL code or description) or 'N.v.t'",
-  "kleur_binnen": "Inside color or 'N.v.t'",
-  "kleur_buiten": "Outside color or 'N.v.t'",
+  "kleur_kozijn_binnen": "Inside frame color (RAL code or description) or 'N.v.t'",
+  "kleur_vleugel_binnen": "Inside sash/wing color (RAL code or description) or 'N.v.t'",
+  "kleur_kozijn_buiten": "Outside frame color (RAL code or description) or 'N.v.t'",
+  "kleur_vleugel_buiten": "Outside sash/wing color (RAL code or description) or 'N.v.t'",
+  "kleur_binnenafwerking": "Interior finish color or type or 'N.v.t'",
 
-  "draairichting": "Links, Rechts, or 'N.v.t' (for doors)",
+  "model_deur": "Door model name or type (e.g. 'Paneeldeur', 'Vlakke deur') or 'N.v.t'",
+  "type_profiel_kozijn": "Frame/profile type (e.g. 'Kunststof', 'Aluminium', 'Hout') or 'N.v.t'",
 
-  "deurbeslag_binnen": "Inside door hardware or 'N.v.t'",
-  "deurbeslag_buiten": "Outside door hardware or 'N.v.t'",
-  "staafgreep_specificatie": "Bar handle specs (e.g. 'RVS P45 30x600mm') or 'N.v.t'",
-  "scharnieren_type": "Hinge type or 'N.v.t'",
-  "type_cilinder": "Cylinder type or 'N.v.t'",
+  "draairichting": "Links, Rechts, or 'N.v.t' (for doors, from inside view)",
+
+  "kleur_deurbeslag_binnen": "Color of inside door hardware or 'N.v.t'",
+  "kleur_deurbeslag_buiten": "Color of outside door hardware or 'N.v.t'",
+  "soort_staafgreep": "Bar handle type/specs (e.g. 'RVS P45 30x600mm') or 'N.v.t'",
+  "kleur_scharnieren": "Hinge color or 'N.v.t'",
+  "type_cilinder": "Cylinder type (e.g. 'Gelijksluitende cilinders') or 'N.v.t'",
   "cilinder_gelijksluitend": "Ja if cylinders are 'gelijksluitend', else 'N.v.t'",
 
   "soort_onderdorpel": "Threshold type (e.g. 'Hardstenen onderdorpel') or 'N.v.t'",
   "brievenbus": "Ja if mailbox mentioned, else 'N.v.t'",
   "afwatering": "Drainage info or 'N.v.t'",
-  "binnenafwerking": "Interior finish or 'N.v.t'",
 
   "extra_opties": "List all extra options, surcharges (meerprijs), special features. Join with newlines. Use 'N.v.t' if none."
 }}
 
 RULES:
 - Extract dimensions from patterns like (1234x5678mm) or (1234x5678)
+- For "locatie": Look for room names like 'Slaapkamer', 'Woonkamer', 'Badkamer', 'Zolder', 'Garage', etc. Often appears after dimensions or with 'Plaats:'
 - For "glas_type", ONLY use one of these exact values: Triple, HR++, HR+++, Veiligheidsglas, Dubbelglas, Anders
 - For boolean-like fields (cilinder_gelijksluitend, brievenbus), return "Ja" if mentioned, else "N.v.t"
-- For colors: look for RAL codes, color names in subproducts with "Meerprijs afwijkende kleur"
-- For hardware: look for "beslag", "greep", "cilinder", "hang- en sluitwerk"
+- For colors: Distinguish between kozijn (frame) and vleugel (sash/wing). Look for RAL codes, color names in subproducts with "Meerprijs afwijkende kleur"
+- For hardware: look for "beslag", "greep", "cilinder", "hang- en sluitwerk", "scharnieren"
 - If a field is not mentioned or not applicable to this product type, use "N.v.t"
 - Return ONLY valid JSON, no markdown or extra text
 """

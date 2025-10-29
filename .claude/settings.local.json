@@ -86,7 +86,8 @@
       "Bash(/mnt/c/Program Files/nodejs/npm.cmd --version)",
       "Read(//mnt/c/Program Files/nodejs/**)",
       "Bash(/mnt/c/Windows/System32/cmd.exe /c \"npm install -g @anthropic-ai/claude-code\")",
-      "Bash(/mnt/c/Windows/System32/cmd.exe /c \"where claude\")"
+      "Bash(/mnt/c/Windows/System32/cmd.exe /c \"where claude\")",
+      "Bash(claude mcp list:*)"
     ],
     "deny": []
   }

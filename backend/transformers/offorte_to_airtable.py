@@ -252,21 +252,26 @@ def transform_pricetable_to_specs(
 
         # Glas
         "Glas Type": get_or_nvt('glas_type'),
-        "Glas Detail": get_or_nvt('glas_detail'),
 
-        # Kleur
-        "Kleur Kozijn": get_or_nvt('kleur_kozijn'),
-        "Kleur Binnen": get_or_nvt('kleur_binnen'),
-        "Kleur Buiten": get_or_nvt('kleur_buiten'),
+        # Kleur - New split fields for kozijn and vleugel
+        "Kleur Kozijn Binnen": get_or_nvt('kleur_kozijn_binnen'),
+        "Kleur Vleugel Binnen": get_or_nvt('kleur_vleugel_binnen'),
+        "Kleur Kozijn Buiten": get_or_nvt('kleur_kozijn_buiten'),
+        "Kleur Vleugel Buiten": get_or_nvt('kleur_vleugel_buiten'),
+        "Kleur Binnenafwerking": get_or_nvt('kleur_binnenafwerking'),
+
+        # Product specifiek
+        "Model Deur": get_or_nvt('model_deur'),
+        "Type Profiel/Kozijn": get_or_nvt('type_profiel_kozijn'),
 
         # Deur specifiek
-        "Draairichting": get_or_nvt('draairichting'),
+        "Draairichting (binnenaanzicht)": get_or_nvt('draairichting'),
 
-        # Beslag/Hardware
-        "Deurbeslag Binnen": get_or_nvt('deurbeslag_binnen'),
-        "Deurbeslag Buiten": get_or_nvt('deurbeslag_buiten'),
-        "Staafgreep Specificatie": get_or_nvt('staafgreep_specificatie'),
-        "Scharnieren Type": get_or_nvt('scharnieren_type'),
+        # Beslag/Hardware - New field names with colors
+        "Kleur Deurbeslag Binnen": get_or_nvt('kleur_deurbeslag_binnen'),
+        "Kleur Deurbeslag Buiten": get_or_nvt('kleur_deurbeslag_buiten'),
+        "Soort Staafgreep": get_or_nvt('soort_staafgreep'),
+        "Kleur Sharnieren": get_or_nvt('kleur_scharnieren'),
         "Type Cilinder": get_or_nvt('type_cilinder'),
         "Cilinder Gelijksluitend": get_or_nvt('cilinder_gelijksluitend'),
 
@@ -274,9 +279,6 @@ def transform_pricetable_to_specs(
         "Soort Onderdorpel": get_or_nvt('soort_onderdorpel'),
         "Brievenbus": get_or_nvt('brievenbus'),
         "Afwatering": get_or_nvt('afwatering'),
-
-        # Overig
-        "Binnenafwerking": get_or_nvt('binnenafwerking'),
 
         # Extra Options
         "Extra Opties": get_or_nvt('extra_opties'),

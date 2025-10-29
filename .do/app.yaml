@@ -1,0 +1,83 @@
+name: stbparser
+region: ams
+
+# Managed Redis Database (create this in DigitalOcean Console first)
+databases:
+  - name: redis
+    engine: REDIS
+    production: false
+    version: "7"
+
+services:
+  # FastAPI Web Service (webhook receiver)
+  - name: api
+    source:
+      repo: <your-github-repo>
+      branch: main
+    dockerfile_path: Dockerfile
+    github:
+      deploy_on_push: true
+    http_port: 8002
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 40
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+    run_command: python3 -m backend.api.server
+    envs:
+      - key: SERVER_PORT
+        value: "8002"
+      - key: REDIS_URL
+        value: ${redis.DATABASE_URL}
+      - key: OFFORTE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: OFFORTE_ACCOUNT_NAME
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_BASE_STB_SALES
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_BASE_STB_ADMINISTRATIE
+        scope: RUN_TIME
+        type: SECRET
+
+# Celery Background Worker
+workers:
+  - name: worker
+    source:
+      repo: <your-github-repo>
+      branch: main
+    dockerfile_path: Dockerfile
+    github:
+      deploy_on_push: true
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A backend.workers.worker worker --loglevel=info
+    envs:
+      - key: REDIS_URL
+        value: ${redis.DATABASE_URL}
+      - key: OFFORTE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: OFFORTE_ACCOUNT_NAME
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_BASE_STB_SALES
+        scope: RUN_TIME
+        type: SECRET
+      - key: AIRTABLE_BASE_STB_ADMINISTRATIE
+        scope: RUN_TIME
+        type: SECRET
