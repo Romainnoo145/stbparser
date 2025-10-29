@@ -152,12 +152,6 @@ def transform_pricetable_to_element(
     element_btw = element_total_excl * btw_percentage
     element_total_incl = element_total_excl + element_btw
 
-    # Check for hordeuren
-    heeft_hordeuren = specs.get('heeft_hordeuren', False) or any(
-        'hordeur' in row.get('product_name', '').lower()
-        for row in rows[1:]
-    )
-
     return {
         "Opdrachtnummer": proposal_id,
         "Element ID": element_id,
@@ -175,10 +169,9 @@ def transform_pricetable_to_element(
         # Subproducten Summary
         "Subproducten Count": subproduct_count,
         "Subproducten Totaal Excl BTW": subproduct_total,
-        "Heeft Hordeuren": heeft_hordeuren,
 
         # Prijzen
-        "Element Subtotaal Excl BTW": element_subtotal,
+        "Element Subtotaal Excl BTW": element_subtotaal,
         "Element Korting": element_discount,
         "Element Totaal Excl BTW": element_total_excl,
         "Element BTW Bedrag": element_btw,
@@ -244,10 +237,10 @@ def transform_pricetable_to_specs(
         "Element Naam": product_name,
         "Locatie": "",  # Not available in Offorte
 
-        # Afmetingen
+        # Afmetingen - Use correct field names from Airtable
         "Geoffreerde Afmetingen": afmetingen,
-        "Breedte": breedte,
-        "Hoogte": hoogte,
+        "Breedte (mm)": breedte,
+        "Hoogte (mm)": hoogte,
 
         # Glas
         "Glas Type": specs.get('glas_type', ''),

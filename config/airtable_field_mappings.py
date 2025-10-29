@@ -59,7 +59,6 @@ ELEMENTEN_OVERZICHT_FIELDS = {
     # Subproducten Summary
     "subproducten_count": "Subproducten Count",
     "subproducten_totaal_excl_btw": "Subproducten Totaal Excl BTW",
-    "heeft_hordeuren": "Heeft Hordeuren",
 
     # Prijzen
     "element_subtotaal_excl_btw": "Element Subtotaal Excl BTW",
