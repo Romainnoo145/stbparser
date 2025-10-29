@@ -171,7 +171,7 @@ def transform_pricetable_to_element(
         "Subproducten Totaal Excl BTW": subproduct_total,
 
         # Prijzen
-        "Element Subtotaal Excl BTW": element_subtotaal,
+        "Element Subtotaal Excl BTW": element_subtotal,
         "Element Korting": element_discount,
         "Element Totaal Excl BTW": element_total_excl,
         "Element BTW Bedrag": element_btw,
