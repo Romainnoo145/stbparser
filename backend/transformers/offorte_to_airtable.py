@@ -258,19 +258,20 @@ def transform_pricetable_to_specs(
         "Breedte (mm)": breedte,
         "Hoogte (mm)": hoogte,
 
-        # Glas
-        "Glas Type": get_or_nvt('glas_type'),
+        # Profiel & Glas
+        "Type Profiel/Kozijn": get_or_nvt('type_profiel_kozijn'),
+        "Type Glas": get_or_nvt('glas_type'),
 
-        # Kleur - New split fields for kozijn and vleugel
+        # Kleur - Split fields for kozijn and vleugel
         "Kleur Kozijn Binnen": get_or_nvt('kleur_kozijn_binnen'),
         "Kleur Vleugel Binnen": get_or_nvt('kleur_vleugel_binnen'),
         "Kleur Kozijn Buiten": get_or_nvt('kleur_kozijn_buiten'),
         "Kleur Vleugel Buiten": get_or_nvt('kleur_vleugel_buiten'),
         "Kleur Binnenafwerking": get_or_nvt('kleur_binnenafwerking'),
+        "Kleur Afstandhouders": get_or_nvt('kleur_afstandhouders'),
 
         # Product specifiek
-        "Model Deur": get_or_nvt('model_deur'),
-        "Type Profiel/Kozijn": get_or_nvt('type_profiel_kozijn'),
+        "Model Deurpaneel": get_or_nvt('model_deurpaneel'),
 
         # Deur specifiek
         "Draairichting (binnenaanzicht)": get_or_nvt('draairichting'),
@@ -284,12 +285,13 @@ def transform_pricetable_to_specs(
         "Cilinder Gelijksluitend": get_or_nvt('cilinder_gelijksluitend'),
 
         # Dorpel/Onderdelen
-        "Soort Onderdorpel": get_or_nvt('soort_onderdorpel'),
+        "Soort Dorpel": get_or_nvt('soort_dorpel'),
         "Brievenbus": get_or_nvt('brievenbus'),
         "Afwatering": get_or_nvt('afwatering'),
 
-        # Extra Options
+        # Extra Options & Opmerkingen
         "Extra Opties": get_or_nvt('extra_opties'),
+        "Opmerkingen voor Binnendienst": get_or_nvt('opmerkingen'),
 
         # Review
         "Verkoop Review Status": "In Review",
