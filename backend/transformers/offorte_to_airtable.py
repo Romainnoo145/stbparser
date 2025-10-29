@@ -147,9 +147,9 @@ def transform_pricetable_to_element(
     element_total_excl = element_subtotal - element_discount
 
     # Calculate BTW (21% is default in NL)
-    # Note: Airtable percent field expects 0-1 range, not 0-100
-    btw_percentage = 0.21  # 21% as decimal for Airtable
-    element_btw = element_total_excl * btw_percentage
+    # Note: Airtable percent field expects the actual percentage number (21, not 0.21)
+    btw_percentage = 21  # 21% for Airtable percent field
+    element_btw = element_total_excl * (btw_percentage / 100)  # Calculate actual BTW amount
     element_total_incl = element_total_excl + element_btw
 
     return {
@@ -251,8 +251,24 @@ def transform_pricetable_to_specs(
         "Kleur Binnen": specs.get('kleur_binnen', ''),
         "Kleur Buiten": specs.get('kleur_buiten', ''),
 
-        # Deur
+        # Deur specifiek
         "Draairichting": specs.get('draairichting', ''),
+
+        # Beslag/Hardware (NEW!)
+        "Deurbeslag Binnen": specs.get('deurbeslag_binnen', ''),
+        "Deurbeslag Buiten": specs.get('deurbeslag_buiten', ''),
+        "Staafgreep Specificatie": specs.get('staafgreep_specificatie', ''),
+        "Scharnieren Type": specs.get('scharnieren_type', ''),
+        "Type Cilinder": specs.get('type_cilinder', ''),
+        "Cilinder Gelijksluitend": specs.get('cilinder_gelijksluitend', ''),
+
+        # Dorpel/Onderdelen (NEW!)
+        "Soort Onderdorpel": specs.get('soort_onderdorpel', ''),
+        "Brievenbus": specs.get('brievenbus', ''),
+        "Afwatering": specs.get('afwatering', ''),
+
+        # Overig (NEW!)
+        "Binnenafwerking": specs.get('binnenafwerking', ''),
 
         # Extra Options
         "Extra Opties": specs.get('extra_opties', ''),
@@ -289,22 +305,47 @@ def transform_pricetable_rows_to_subproducten(
     subproducten = []
 
     # Skip first row (that's the hoofdproduct)
-    for row in rows[1:]:
+    for idx, row in enumerate(rows[1:], start=1):
         product_name = row.get('product_name', '')
         description = row.get('description', '')
         price = float(row.get('price', 0))
         quantity = int(row.get('quantity', 1))
         subtotal = price * quantity
 
-        # Determine subproduct type/category
-        # Don't default to "Standaard" - let Airtable handle empty values
+        # Generate unique Subproduct ID: element_id-S1, element_id-S2, etc.
+        subproduct_id = f"{element_id}-S{idx}"
+
+        # Determine subproduct category and type
+        # Subproduct Categorie: what kind of product (Kleur, Glas, Beslag, Hordeur, etc.)
+        # Subproduct Type: pricing nature (Meerprijs, Optie, Accessoire, Korting)
         category = None
-        if 'hordeur' in product_name.lower():
-            category = "Hordeur"
-        elif 'glas' in product_name.lower():
+        product_lower = product_name.lower()
+        description_lower = description.lower()
+
+        # Determine category
+        if 'kleur' in product_lower or 'ral' in product_lower:
+            category = "Kleur"
+        elif 'glas' in product_lower or 'beglazing' in product_lower:
             category = "Glas"
-        elif 'beslag' in product_name.lower():
+        elif 'beslag' in product_lower or 'greep' in product_lower or 'cilinder' in product_lower:
             category = "Beslag"
+        elif 'hordeur' in product_lower:
+            category = "Hordeur"
+        elif 'dorpel' in product_lower:
+            category = "Dorpel"
+        elif 'ventilatie' in product_lower or 'rooster' in product_lower:
+            category = "Ventilatie"
+        else:
+            category = "Anders"
+
+        # Determine type (most Offorte items are meerprijs/options)
+        subproduct_type = "Meerprijs"  # Default
+        if 'korting' in product_lower or 'afprijzing' in product_lower or price < 0:
+            subproduct_type = "Korting"
+        elif 'optie' in product_lower or 'extra' in product_lower:
+            subproduct_type = "Optie"
+        elif 'accessoire' in product_lower:
+            subproduct_type = "Accessoire"
 
         subproducten.append({
             "Element ID Ref": element_id,
@@ -313,10 +354,10 @@ def transform_pricetable_rows_to_subproducten(
             "Element Type": element_type,
 
             # Subproduct Info
-            "Subproduct Type": category,
+            "Subproduct Type": subproduct_type,  # Meerprijs, Optie, Accessoire, Korting
             "Subproduct Naam": product_name,
             "Subproduct Beschrijving": description,
-            "Subproduct Categorie": category,
+            "Subproduct Categorie": category,  # Kleur, Glas, Beslag, etc.
             "Bron": "Offorte",
 
             # Prijzen
@@ -362,7 +403,8 @@ def transform_element_to_nacalculatie(
         "Verkoop Datum": proposal_date or datetime.now().strftime('%Y-%m-%d'),
 
         # Kostprijs (to be filled manually later in Airtable)
-        "Kostprijs Status": None,
+        # Choices: Te Berekenen, Berekend, Definitief
+        "Kostprijs Status": "Te Berekenen",
     }
 
 

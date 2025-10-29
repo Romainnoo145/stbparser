@@ -185,6 +185,69 @@ class AirtableSync:
             logger.error(f"Error upserting to {table_name}: {e}")
             return None
 
+    def create_record(
+        self,
+        table_internal_name: str,
+        record_data: Dict[str, Any]
+    ) -> Optional[str]:
+        """
+        Create a new record in Airtable without checking for existing records.
+
+        Use this for tables where multiple records can have the same key field value,
+        like Subproducten where multiple subproducts share the same Element ID Ref.
+
+        Args:
+            table_internal_name: Internal table name (e.g., 'subproducten')
+            record_data: Dictionary of field values
+
+        Returns:
+            Record ID if successful, None otherwise
+        """
+        config = get_table_config(table_internal_name)
+        if not config:
+            logger.error(f"Unknown table: {table_internal_name}")
+            return None
+
+        base_id = self._get_base_id(table_internal_name)
+        table_name = config.name
+
+        # Clean the record data
+        record_data = self._clean_record_data(record_data)
+
+        if not base_id:
+            logger.error(f"Could not determine base ID for {table_internal_name}")
+            return None
+
+        url = f"{self.base_url}/{base_id}/{table_name}"
+
+        try:
+            # Always create new record
+            payload = {"fields": record_data}
+            response = requests.post(url, headers=self.headers, json=payload, timeout=10)
+            response.raise_for_status()
+            record_id = response.json().get('id')
+
+            # Log with subproduct name for clarity
+            identifier = record_data.get('Subproduct Naam', record_data.get('Element ID Ref', 'Unknown'))
+            logger.info(f"Created record in {table_name}: {identifier}")
+            return record_id
+
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"HTTP error creating record in {table_name}: {e}")
+            if e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    logger.error(f"Response: {error_detail}")
+                except:
+                    logger.error(f"Response text: {e.response.text}")
+            else:
+                logger.error("No response available")
+            logger.error(f"Record data: {record_data}")
+            return None
+        except Exception as e:
+            logger.error(f"Error creating record in {table_name}: {e}")
+            return None
+
     def upsert_records(
         self,
         table_internal_name: str,
@@ -192,6 +255,9 @@ class AirtableSync:
     ) -> Dict[str, int]:
         """
         Upsert multiple records to a table.
+
+        For Subproducten: Always creates new records (no upsert check)
+        For other tables: Upserts based on key field
 
         Args:
             table_internal_name: Internal table name
@@ -202,18 +268,33 @@ class AirtableSync:
         """
         stats = {"created": 0, "updated": 0, "failed": 0}
 
-        for record in records:
-            result = self.upsert_record(table_internal_name, record)
-            if result:
-                # Can't distinguish created vs updated without checking if record existed
-                stats["created"] += 1
-            else:
-                stats["failed"] += 1
+        # Special handling for Subproducten - always create, never update
+        # Multiple subproducts can share the same Element ID Ref
+        if table_internal_name == 'subproducten':
+            for record in records:
+                result = self.create_record(table_internal_name, record)
+                if result:
+                    stats["created"] += 1
+                else:
+                    stats["failed"] += 1
 
-        logger.info(
-            f"Batch upsert to {table_internal_name}: "
-            f"{stats['created']} succeeded, {stats['failed']} failed"
-        )
+            logger.info(
+                f"Batch create to {table_internal_name}: "
+                f"{stats['created']} created, {stats['failed']} failed"
+            )
+        else:
+            # Normal upsert logic for other tables
+            for record in records:
+                result = self.upsert_record(table_internal_name, record)
+                if result:
+                    stats["created"] += 1
+                else:
+                    stats["failed"] += 1
+
+            logger.info(
+                f"Batch upsert to {table_internal_name}: "
+                f"{stats['created']} succeeded, {stats['failed']} failed"
+            )
 
         return stats
 
