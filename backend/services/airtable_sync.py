@@ -90,6 +90,7 @@ class AirtableSync:
 
         - Remove empty strings (causes issues with singleSelect fields)
         - Remove None values
+        - Convert "N.v.t" to "N.v.t." for singleSelect fields that require it
 
         Args:
             record_data: Raw record data
@@ -97,12 +98,25 @@ class AirtableSync:
         Returns:
             Cleaned record data
         """
+        # Fields that use "N.v.t." (with period) in Airtable
+        nvt_with_period_fields = {
+            'Locatie',
+            'Cilinder Gelijksluitend',
+            'Brievenbus'
+        }
+
         cleaned = {}
         for key, value in record_data.items():
             # Skip empty strings and None values
             if value == "" or value is None:
                 continue
-            cleaned[key] = value
+
+            # Convert "N.v.t" to "N.v.t." for specific singleSelect fields
+            if key in nvt_with_period_fields and value == "N.v.t":
+                cleaned[key] = "N.v.t."
+            else:
+                cleaned[key] = value
+
         return cleaned
 
     def upsert_record(
