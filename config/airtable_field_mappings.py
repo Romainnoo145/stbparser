@@ -235,14 +235,15 @@ FACTURATIE_FIELDS = {
     "factuurtitel": "Factuurtitel",
 }
 
-# Table 2: Inmeetplanning (23 velden) - BESTAAND
+# Table 2: Inmeetplanning (21 velden) - BESTAAND
 INMEETPLANNING_FIELDS = {
     "opdrachtnummer": "Opdrachtnummer",
     "klant_en_stad": "Klant & Stad",
     "telefoon": "Telefoon",
     "elementen": "Elementen",
+    "elementen_overzicht": "Elementen Overzicht",
+    "locaties": "Locaties",
     "uren": "Uren",
-    "waarde": "Waarde",
     "projectstatus": "Projectstatus",
     "klantnaam": "Klantnaam",
     "email": "E-mail",
@@ -253,9 +254,6 @@ INMEETPLANNING_FIELDS = {
     "opdracht_verkocht_op": "Opdracht verkocht op",
     "total_amount_incl_btw": "Total Amount Incl BTW",
     "aantal_elementen": "Aantal Elementen",
-    "elementen_overzicht": "Elementen Overzicht",
-    "locaties": "Locaties",
-    "geschatte_uren": "Geschatte Uren",
     "planning_notities": "Planning Notities",
     "uiterlijke_montagedatum": "Uiterlijke montagedatum",
     "inmeetdatum": "Inmeetdatum",

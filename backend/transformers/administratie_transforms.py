@@ -6,9 +6,15 @@ These functions transform Offorte proposals to Inmeetplanning, Projecten, and Fa
 
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+from backend.transformers.specs_parser import extract_product_name_clean
 
 
-def transform_proposal_to_inmeetplanning(proposal_data: Dict[str, Any]) -> Dict[str, Any]:
+def transform_proposal_to_inmeetplanning(
+    proposal_data: Dict[str, Any],
+    elementen_overzicht: List[Dict[str, Any]] = None,
+    hoofdproduct_specs: List[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
     Transform proposal to Inmeetplanning record (STB-ADMINISTRATIE).
 
@@ -16,6 +22,8 @@ def transform_proposal_to_inmeetplanning(proposal_data: Dict[str, Any]) -> Dict[
 
     Args:
         proposal_data: Complete proposal from Offorte
+        elementen_overzicht: List of element records (optional, for better data)
+        hoofdproduct_specs: List of hoofdproduct specificaties (optional, for locaties)
 
     Returns:
         Inmeetplanning record dict
@@ -37,9 +45,70 @@ def transform_proposal_to_inmeetplanning(proposal_data: Dict[str, Any]) -> Dict[
     total_incl = float(proposal_data.get('price_total_original', 0) or 0)
 
     # Count elements
-    content = proposal_data.get('content', {})
-    pricetables = content.get('pricetables', []) if content else proposal_data.get('pricetables', [])
-    num_elements = len(pricetables)
+    if elementen_overzicht:
+        num_elements = len(elementen_overzicht)
+    else:
+        content = proposal_data.get('content', {})
+        pricetables = content.get('pricetables', []) if content else proposal_data.get('pricetables', [])
+        num_elements = len(pricetables)
+
+    # Calculate estimated hours for measurement
+    # Base: 15 minutes per element (middle of 10-20 range)
+    # Add extra time for doors (more complex) and upper floors
+    estimated_minutes = 0
+    has_upper_floor = False
+
+    if elementen_overzicht:
+        for element in elementen_overzicht:
+            element_type = element.get('Hoofdproduct Type', '')
+
+            # Base time per element
+            if 'deur' in element_type.lower():
+                estimated_minutes += 20  # Doors take longer
+            else:
+                estimated_minutes += 15  # Windows average time
+
+        # Check for upper floors in locaties
+        if hoofdproduct_specs:
+            for spec in hoofdproduct_specs:
+                locatie = spec.get('Locatie', '').lower()
+                if any(floor in locatie for floor in ['eerste verdieping', 'tweede verdieping', 'zolder']):
+                    has_upper_floor = True
+                    break
+
+        # Add 20% extra time if there are upper floors (ladder needed)
+        if has_upper_floor:
+            estimated_minutes = int(estimated_minutes * 1.2)
+    else:
+        # Fallback: 15 min per element
+        estimated_minutes = num_elements * 15
+
+    # Convert to hours and round to nearest 0.5
+    estimated_hours = estimated_minutes / 60
+    # Round to nearest 0.5 (e.g., 1.2 -> 1.0, 1.3 -> 1.5, 1.8 -> 2.0)
+    estimated_hours = round(estimated_hours * 2) / 2
+
+    # Create elements overview (list of all element names)
+    elementen_overview_text = ""
+    if elementen_overzicht:
+        element_lines = []
+        for i, elem in enumerate(elementen_overzicht, 1):
+            naam = elem.get('Hoofdproduct Naam', 'Element')
+            element_type = elem.get('Hoofdproduct Type', '')
+            element_lines.append(f"{i}. {naam} ({element_type})")
+        elementen_overview_text = "\n".join(element_lines)
+
+    # Extract unique locaties
+    locaties_text = ""
+    if hoofdproduct_specs:
+        unique_locaties = set()
+        for spec in hoofdproduct_specs:
+            locatie = spec.get('Locatie', '').strip()
+            if locatie and locatie.lower() != 'n.v.t':
+                unique_locaties.add(locatie)
+
+        if unique_locaties:
+            locaties_text = "\n".join(sorted(unique_locaties))
 
     return {
         "Opdrachtnummer": proposal_id,
@@ -55,6 +124,9 @@ def transform_proposal_to_inmeetplanning(proposal_data: Dict[str, Any]) -> Dict[
         "Total Amount Incl BTW": total_incl,
         "Aantal Elementen": num_elements,
         "Elementen": num_elements,  # Number field (not text)
+        "Elementen Overzicht": elementen_overview_text if elementen_overview_text else None,
+        "Locaties": locaties_text if locaties_text else None,
+        "Uren": estimated_hours,
         "Projectstatus": "Te Plannen",  # Valid: Te Plannen, Gepland, Voltooid, Geannuleerd
         "Start Inmeetplanning Trigger": True,  # Trigger for automation
     }
@@ -95,13 +167,18 @@ def transform_proposal_to_project(proposal_data: Dict[str, Any]) -> Dict[str, An
     pricetables = content.get('pricetables', []) if content else proposal_data.get('pricetables', [])
     num_elements = len(pricetables)
 
-    # Create summary (first 5 elements)
-    element_types = []
+    # Create summary (first 5 elements) - extract clean product names
+    element_names = []
     for pt in pricetables[:5]:  # First 5
-        title = pt.get('title', 'Element')
-        element_types.append(title)
+        rows = pt.get('rows', [])
+        if rows:
+            html_content = rows[0].get('content', '')
+            product_name = extract_product_name_clean(html_content)
+            element_names.append(product_name)
+        else:
+            element_names.append('Element')
 
-    elements_summary = ", ".join(element_types)
+    elements_summary = ", ".join(element_names)
     if len(pricetables) > 5:
         elements_summary += f" (+{len(pricetables) - 5} meer)"
 

@@ -563,7 +563,11 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
 
     # 6. Inmeetplanning (STB-ADMINISTRATIE) - 1 record per proposal
     from backend.transformers.administratie_transforms import transform_proposal_to_inmeetplanning
-    inmeetplanning = [transform_proposal_to_inmeetplanning(proposal_data)]
+    inmeetplanning = [transform_proposal_to_inmeetplanning(
+        proposal_data,
+        elementen_overzicht=elementen_overzicht,
+        hoofdproduct_specs=hoofdproduct_specificaties
+    )]
 
     # 7. Projecten (STB-ADMINISTRATIE) - 1 record per proposal
     from backend.transformers.administratie_transforms import transform_proposal_to_project
