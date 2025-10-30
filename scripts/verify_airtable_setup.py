@@ -34,8 +34,9 @@ sales_tables = get_tables(STB_SALES_BASE)
 expected_sales = [
     "Klantenportaal",
     "Elementen Overzicht",
-    "Element Specificaties",
+    "Hoofdproduct Specificaties",  # Renamed from Element Specificaties
     "Subproducten",
+    "Subproducten Kostprijzen",  # NEW table
     "Nacalculatie"
 ]
 

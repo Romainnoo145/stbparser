@@ -397,6 +397,10 @@ def transform_pricetable_rows_to_subproducten(
             subproduct_type = "Accessoire"
 
         subproducten.append({
+            # Unique ID
+            "Subproduct ID": subproduct_id,
+
+            # Links
             "Element ID Ref": element_id,
             "Opdrachtnummer": proposal_id,
             "Klantnaam": customer_name,

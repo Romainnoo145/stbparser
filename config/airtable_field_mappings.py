@@ -137,8 +137,11 @@ HOOFDPRODUCT_SPECIFICATIES_FIELDS = {
     "opmerkingen_voor_binnendienst": "Opmerkingen voor Binnendienst",
 }
 
-# Table 4: Subproducten (15 velden - verkoop data only)
+# Table 4: Subproducten (16 velden - verkoop data only)
 SUBPRODUCTEN_FIELDS = {
+    # Unique ID
+    "subproduct_id": "Subproduct ID",
+
     # Identificatie
     "element_id_ref": "Element ID Ref",
     "opdrachtnummer": "Opdrachtnummer",
@@ -340,14 +343,14 @@ TABLE_CONFIGS: Dict[str, TableConfig] = {
         name="Subproducten",
         base_type="sales",
         airtable_base_id="airtable_base_stb_sales",
-        key_field="Element ID Ref",  # Not unique, multiple per element
+        key_field="Subproduct ID",  # Unique ID per subproduct
         fields=SUBPRODUCTEN_FIELDS
     ),
     "subproducten_kostprijzen": TableConfig(
         name="Subproducten Kostprijzen",
         base_type="sales",
         airtable_base_id="airtable_base_stb_sales",
-        key_field="Subproduct ID Ref",  # Not unique if manually added
+        key_field="Subproduct ID Ref",  # Links to Subproducten
         fields=SUBPRODUCTEN_KOSTPRIJZEN_FIELDS
     ),
     "nacalculatie": TableConfig(
