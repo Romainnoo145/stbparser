@@ -87,7 +87,8 @@ def transform_pricetable_to_element(
     pricetable: Dict[str, Any],
     proposal_id: str,
     customer_name: str,
-    element_index: int
+    element_index: int,
+    discount_percentage: float = 0
 ) -> Dict[str, Any]:
     """
     Transform a single Offorte pricetable into an Element record.
@@ -147,7 +148,9 @@ def transform_pricetable_to_element(
 
     # Element totals
     element_subtotal = main_subtotal + subproduct_total
-    element_discount = float(pricetable.get('discount_value', 0))
+
+    # Apply proportional discount based on overall proposal discount percentage
+    element_discount = element_subtotal * (discount_percentage / 100)
     element_total_excl = element_subtotal - element_discount
 
     # Calculate BTW (21% is default in NL)
@@ -397,9 +400,9 @@ def transform_pricetable_rows_to_subproducten(
             "Bron": "Offorte",
 
             # Prijzen
-            "Prijs Per Stuk Excl BTW": price,
+            "Prijs Per Stuk (Excl BTW)": price,
             "Aantal": quantity,
-            "Subtotaal Excl BTW": subtotal,
+            "Verkoopprijs totaal (Excl BTW)": subtotal,
 
             # Offorte Meta
             "Product ID": str(row.get('product_id', '')),
@@ -478,6 +481,41 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
     # 1. Klantenportaal (1 record per proposal)
     klantenportaal = [transform_proposal_to_klantenportaal(proposal_data)]
 
+    # FIRST PASS: Extract specs and calculate total discount
+    total_subtotal = 0
+    total_discount = 0
+    pricetable_subtotals = []
+
+    for idx, pricetable in enumerate(pricetables):
+        rows = pricetable.get('rows', [])
+        if not rows:
+            pricetable_subtotals.append(0)
+            continue
+
+        # Calculate element subtotal
+        main_row = rows[0]
+        main_price = float(main_row.get('price', 0))
+        main_quantity = int(main_row.get('quantity', 1))
+        main_subtotal = main_price * main_quantity
+
+        subproduct_total = sum(
+            float(row.get('price', 0)) * int(row.get('quantity', 1))
+            for row in rows[1:]
+        )
+
+        element_subtotal = main_subtotal + subproduct_total
+        pricetable_subtotals.append(element_subtotal)
+        total_subtotal += element_subtotal
+
+        # Extract discount from LLM specs
+        specs = extract_specs_from_pricetable(pricetable)
+        korting_bedrag = float(specs.get('korting_bedrag', 0))
+        total_discount += korting_bedrag
+
+    # Calculate discount percentage
+    discount_percentage = (total_discount / total_subtotal * 100) if total_subtotal > 0 else 0
+    logger.info(f"Total discount: €{total_discount:.2f} on subtotal €{total_subtotal:.2f} = {discount_percentage:.2f}%")
+
     # 2-5. Per pricetable: Element, Specs, Subproducten, Nacalculatie
     elementen_overzicht = []
     element_specificaties = []
@@ -487,7 +525,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
     for idx, pricetable in enumerate(pricetables):
         # Element record
         element = transform_pricetable_to_element(
-            pricetable, proposal_id, customer_name, idx
+            pricetable, proposal_id, customer_name, idx, discount_percentage
         )
         if not element:
             continue

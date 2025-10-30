@@ -161,7 +161,9 @@ Extract the following fields (return JSON). Use "N.v.t" if a field is not mentio
   "afwatering": "Drainage info or 'N.v.t'",
 
   "extra_opties": "List all extra options, surcharges (meerprijs), special features. Join with newlines. Use 'N.v.t' if none.",
-  "opmerkingen": "Additional notes or special remarks for internal team or 'N.v.t'"
+  "opmerkingen": "Additional notes or special remarks for internal team or 'N.v.t'",
+
+  "korting_bedrag": "Total discount amount in euros (numeric). Look for 'korting', 'totaal minbedrag', 'discount', negative prices. If no discount mentioned, use 0."
 }}
 
 RULES:
