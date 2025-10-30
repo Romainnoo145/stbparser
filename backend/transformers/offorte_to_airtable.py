@@ -166,6 +166,10 @@ def transform_pricetable_to_element(
         "Klantnaam": customer_name,
         "Status": "Nieuw",
 
+        # Locatie en Afmetingen
+        "Locatie": specs.get('locatie', 'N.v.t'),
+        "Geoffreerde Afmetingen (BxH)": specs.get('geoffreerde_afmetingen', 'N.v.t'),
+
         # Hoofdproduct
         "Hoofdproduct Type": element_type,
         "Hoofdproduct Naam": product_name,

@@ -133,7 +133,7 @@ Extract the following fields (return JSON). Use "N.v.t" if a field is not mentio
   "geoffreerde_afmetingen": "Full dimension string like '2450x1760 mm' or 'N.v.t'",
   "breedte": numeric width in mm or null,
   "hoogte": numeric height in mm or null,
-  "locatie": "Location/room (e.g. 'Slaapkamer', 'Woonkamer', 'Zolder'). Look for 'Plaats:' or room names after dimensions. Use 'N.v.t' if not mentioned.",
+  "locatie": "Location/placement description. Look for: Floor + position (e.g. 'begane grond voorgevel', 'eerste verdieping achtergevel', 'begane grond zijgevel'), room names (e.g. 'Slaapkamer', 'Woonkamer', 'Zolder'), or 'Plaats:' text. Use 'N.v.t' only if truly not mentioned.",
 
   "glas_type": "One of: Triple, HR++, HR+++, Veiligheidsglas, Dubbelglas, Anders, or 'N.v.t'",
 
@@ -168,7 +168,7 @@ Extract the following fields (return JSON). Use "N.v.t" if a field is not mentio
 
 RULES:
 - Extract dimensions from patterns like (1234x5678mm) or (1234x5678)
-- For "locatie": Look for room names like 'Slaapkamer', 'Woonkamer', 'Badkamer', 'Zolder', 'Garage', etc. Often appears after dimensions or with 'Plaats:'
+- For "locatie": Look for floor+position patterns ('begane grond voorgevel', 'eerste verdieping achtergevel', 'begane grond zijgevel'), room names ('Slaapkamer', 'Woonkamer', 'Badkamer', 'Zolder', 'Garage'), or 'Plaats:' text. Often appears after dimensions.
 - For "glas_type", ONLY use one of these exact values: Triple, HR++, HR+++, Veiligheidsglas, Dubbelglas, Anders
 - For boolean-like fields (cilinder_gelijksluitend, brievenbus), return "Ja" if mentioned, else "N.v.t"
 - For colors: Distinguish between kozijn (frame) and vleugel (sash/wing). Look for RAL codes, color names in subproducts with "Meerprijs afwijkende kleur"
