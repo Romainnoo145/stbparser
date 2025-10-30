@@ -40,28 +40,21 @@ KLANTENPORTAAL_FIELDS = {
     # "aangemaakt_op" - createdTime field (automatic)
 }
 
-# Table 2: Elementen Overzicht (30 velden)
+# Table 2: Elementen Overzicht (21 velden)
 ELEMENTEN_OVERZICHT_FIELDS = {
     # Identificatie
     "opdrachtnummer": "Opdrachtnummer",
     "element_id": "Element ID",
-    "element_volgnummer": "Element Volgnummer",
     "klantnaam": "Klantnaam",
-    "status": "Status",
-
-    # Locatie en Afmetingen
-    "locatie": "Locatie",
-    "geoffreerde_afmetingen": "Geoffreerde Afmetingen (BxH)",
 
     # Hoofdproduct
     "hoofdproduct_type": "Hoofdproduct Type",
     "hoofdproduct_naam": "Hoofdproduct Naam",
-    "hoofdproduct_beschrijving": "Hoofdproduct Beschrijving",
     "hoofdproduct_prijs_excl_btw": "Hoofdproduct Prijs Excl BTW",
     "hoofdproduct_aantal": "Hoofdproduct Aantal",
 
     # Subproducten Summary
-    "subproducten_count": "Subproducten Count",
+    "subproducten_aantal": "Subproducten Aantal",
     "subproducten_totaal_excl_btw": "Subproducten Totaal Excl BTW",
 
     # Prijzen
@@ -185,7 +178,7 @@ SUBPRODUCTEN_KOSTPRIJZEN_FIELDS = {
     "notities": "Notities",
 }
 
-# Table 6: Nacalculatie (25 velden)
+# Table 6: Nacalculatie (24 velden)
 NACALCULATIE_FIELDS = {
     # Identificatie
     "element_id_ref": "Element ID Ref",
@@ -204,11 +197,10 @@ NACALCULATIE_FIELDS = {
     "hoofdproduct_kostprijs": "Hoofdproduct Kostprijs",
     "materiaal_kostprijs": "Materiaal Kostprijs",
     "arbeid_kostprijs": "Arbeid Kostprijs",
-    "subproducten_kostprijs": "Subproducten Kostprijs",
     "transport_kosten": "Transport Kosten",
     "overige_kosten": "Overige Kosten",
+    # Note: "Kostprijs Hoofdproduct (Excl BTW)" and "Kostprijs Subproduct (Excl BTW)" are lookup/formula fields in Airtable
     "totale_kostprijs": "Totale Kostprijs",
-    "kostprijs_status": "Kostprijs Status",
 
     # Marge Analyse
     "bruto_marge_euro": "Bruto Marge Euro",

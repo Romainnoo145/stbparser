@@ -162,23 +162,16 @@ def transform_pricetable_to_element(
     return {
         "Opdrachtnummer": proposal_id,
         "Element ID": element_id,
-        "Element Volgnummer": element_index + 1,
         "Klantnaam": customer_name,
-        "Status": "Nieuw",
-
-        # Locatie en Afmetingen
-        "Locatie": specs.get('locatie', 'N.v.t'),
-        "Geoffreerde Afmetingen (BxH)": specs.get('geoffreerde_afmetingen', 'N.v.t'),
 
         # Hoofdproduct
         "Hoofdproduct Type": element_type,
         "Hoofdproduct Naam": product_name,
-        "Hoofdproduct Beschrijving": description,
         "Hoofdproduct Prijs Excl BTW": main_price,
         "Hoofdproduct Aantal": main_quantity,
 
         # Subproducten Summary
-        "Subproducten Count": subproduct_count,
+        "Subproducten Aantal": subproduct_count,
         "Subproducten Totaal Excl BTW": subproduct_total,
 
         # Prijzen
@@ -260,10 +253,8 @@ def transform_pricetable_to_specs(
         "Element Naam": product_name,
         "Locatie": get_or_nvt('locatie'),
 
-        # Afmetingen - Use correct field names from Airtable
-        "Geoffreerde Afmetingen": afmetingen if afmetingen != 'N.v.t' else "N.v.t",
-        "Breedte (mm)": breedte,
-        "Hoogte (mm)": hoogte,
+        # Afmetingen
+        "Geoffreerde Afmetingen (BxH)": afmetingen if afmetingen != 'N.v.t' else "N.v.t",
 
         # Profiel & Glas
         "Type Profiel/Kozijn": get_or_nvt('type_profiel_kozijn'),
@@ -455,9 +446,7 @@ def transform_element_to_nacalculatie(
         "Totaal Verkoop Incl BTW": element_data.get("Element Totaal Incl BTW", 0),
         "Verkoop Datum": proposal_date or datetime.now().strftime('%Y-%m-%d'),
 
-        # Kostprijs (to be filled manually later in Airtable)
-        # Choices: Te Berekenen, Berekend, Definitief
-        "Kostprijs Status": "Te Berekenen",
+        # Kostprijs fields (to be filled manually later in Airtable)
     }
 
 

@@ -14,7 +14,8 @@ base_id = settings.airtable_base_stb_sales
 
 # Tables to check
 tables = [
-    "Element Specificaties",
+    "Elementen Overzicht",
+    "Hoofdproduct Specificaties",
     "Subproducten",
     "Nacalculatie"
 ]
