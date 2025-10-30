@@ -349,6 +349,12 @@ def transform_pricetable_rows_to_subproducten(
         quantity = int(row.get('quantity', 1))
         subtotal = price * quantity
 
+        # Skip meaningless rows: €0 with quantity 0, or N.v.t with €0
+        if subtotal == 0 and quantity == 0:
+            continue
+        if product_name.lower() in ['n.v.t', 'n.v.t.', 'nvt'] and price == 0:
+            continue
+
         # Generate unique Subproduct ID: element_id-S1, element_id-S2, etc.
         subproduct_id = f"{element_id}-S{idx}"
 
