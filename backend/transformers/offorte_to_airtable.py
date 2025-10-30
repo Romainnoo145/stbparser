@@ -280,7 +280,7 @@ def transform_pricetable_to_specs(
         "Kleur Deurbeslag Binnen": get_or_nvt('kleur_deurbeslag_binnen'),
         "Kleur Deurbeslag Buiten": get_or_nvt('kleur_deurbeslag_buiten'),
         "Soort Staafgreep": get_or_nvt('soort_staafgreep'),
-        "Kleur Sharnieren": get_or_nvt('kleur_scharnieren'),
+        "Kleur Scharnieren": get_or_nvt('kleur_scharnieren'),
         "Type Cilinder": get_or_nvt('type_cilinder'),
         "Cilinder Gelijksluitend": get_or_nvt('cilinder_gelijksluitend'),
 

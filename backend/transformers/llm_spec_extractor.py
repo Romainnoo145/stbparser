@@ -142,7 +142,7 @@ Extract the following fields (return JSON). Use "N.v.t" if a field is not mentio
   "kleur_kozijn_buiten": "Outside frame color (RAL code or description) or 'N.v.t'",
   "kleur_vleugel_buiten": "Outside sash/wing color (RAL code or description) or 'N.v.t'",
   "kleur_binnenafwerking": "Interior finish color or type or 'N.v.t'",
-  "kleur_afstandhouders": "Spacer color (e.g. 'Warm edge', 'Zwart', 'Grijs', 'Zilver') or 'N.v.t'",
+  "kleur_afstandhouders": "Spacer color - ONLY use 'Aluminium' or 'Zwart'. Default is 'Aluminium' unless specifically mentioned as 'Zwart' or 'N.v.t'",
 
   "model_deurpaneel": "Door panel model name or type (e.g. 'Paneeldeur', 'Vlakke deur') or 'N.v.t'",
   "type_profiel_kozijn": "Frame/profile type (e.g. 'Kunststof', 'Aluminium', 'Hout', 'Verdiept kunststof') or 'N.v.t'",

@@ -22,7 +22,7 @@ DEFAULT_TECH_SPECS = {
     "kleur_kozijn_buiten": "Antraciet Houtnerfstructuur (AP40)",
     "kleur_vleugel_buiten": "Antraciet Houtnerfstructuur (AP40)",
     "kleur_binnenafwerking": "Wit Massa",
-    "kleur_afstandhouders": "Warm edge",  # Standard spacer color
+    "kleur_afstandhouders": "Aluminium",  # Standard spacer color (Aluminium or Zwart)
 }
 
 
