@@ -340,6 +340,12 @@ def transform_pricetable_rows_to_subproducten(
         if li_items:
             description = '\n'.join([li.get_text(strip=True) for li in li_items])
 
+        # Skip unselected optional products (checkboxes not checked)
+        # selectable=True means it's an optional add-on
+        # user_selected=True means the customer checked the box
+        if row.get('selectable') and not row.get('user_selected'):
+            continue
+
         price = float(row.get('price', 0))
         quantity = int(row.get('quantity', 1))
         subtotal = price * quantity
