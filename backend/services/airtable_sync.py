@@ -330,7 +330,7 @@ class AirtableSync:
         sync_order = [
             "klantenportaal",
             "elementen_overzicht",
-            "element_specificaties",
+            "hoofdproduct_specificaties",
             "subproducten",
             "nacalculatie",
             "inmeetplanning",

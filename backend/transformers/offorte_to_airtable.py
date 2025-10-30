@@ -467,7 +467,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
         proposal_data: Complete proposal data from Offorte API
 
     Returns:
-        Dictionary with keys: klantenportaal, elementen_overzicht, element_specificaties,
+        Dictionary with keys: klantenportaal, elementen_overzicht, hoofdproduct_specificaties,
         subproducten, nacalculatie - each containing list of records
     """
     proposal_id = str(proposal_data.get('id', ''))
@@ -528,7 +528,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
 
     # 2-5. Per pricetable: Element, Specs, Subproducten, Nacalculatie
     elementen_overzicht = []
-    element_specificaties = []
+    hoofdproduct_specificaties = []
     subproducten = []
     nacalculatie = []
 
@@ -549,7 +549,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
             pricetable, element_id, proposal_id, customer_name
         )
         if specs:
-            element_specificaties.append(specs)
+            hoofdproduct_specificaties.append(specs)
 
         # Subproducten records (0-N per element)
         subs = transform_pricetable_rows_to_subproducten(
@@ -563,7 +563,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
 
     logger.info(
         f"Created {len(elementen_overzicht)} elements, "
-        f"{len(element_specificaties)} specs, "
+        f"{len(hoofdproduct_specificaties)} specs, "
         f"{len(subproducten)} subproducten, "
         f"{len(nacalculatie)} nacalculatie records"
     )
@@ -588,7 +588,7 @@ def transform_proposal_to_all_records(proposal_data: Dict[str, Any]) -> Dict[str
     return {
         "klantenportaal": klantenportaal,
         "elementen_overzicht": elementen_overzicht,
-        "element_specificaties": element_specificaties,
+        "hoofdproduct_specificaties": hoofdproduct_specificaties,
         "subproducten": subproducten,
         "nacalculatie": nacalculatie,
         "inmeetplanning": inmeetplanning,

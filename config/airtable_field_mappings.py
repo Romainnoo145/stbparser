@@ -40,7 +40,7 @@ KLANTENPORTAAL_FIELDS = {
     # "aangemaakt_op" - createdTime field (automatic)
 }
 
-# Table 2: Elementen Overzicht (28 velden)
+# Table 2: Elementen Overzicht (30 velden)
 ELEMENTEN_OVERZICHT_FIELDS = {
     # Identificatie
     "opdrachtnummer": "Opdrachtnummer",
@@ -48,6 +48,10 @@ ELEMENTEN_OVERZICHT_FIELDS = {
     "element_volgnummer": "Element Volgnummer",
     "klantnaam": "Klantnaam",
     "status": "Status",
+
+    # Locatie en Afmetingen
+    "locatie": "Locatie",
+    "geoffreerde_afmetingen": "Geoffreerde Afmetingen (BxH)",
 
     # Hoofdproduct
     "hoofdproduct_type": "Hoofdproduct Type",
@@ -79,8 +83,8 @@ ELEMENTEN_OVERZICHT_FIELDS = {
     "verkoop_notities": "Verkoop Notities",
 }
 
-# Table 3: Element Specificaties (32 velden)
-ELEMENT_SPECIFICATIES_FIELDS = {
+# Table 3: Hoofdproduct Specificaties (32 velden)
+HOOFDPRODUCT_SPECIFICATIES_FIELDS = {
     # Identificatie
     "element_id_ref": "Element ID Ref",
     "opdrachtnummer": "Opdrachtnummer",
@@ -133,7 +137,7 @@ ELEMENT_SPECIFICATIES_FIELDS = {
     "opmerkingen_voor_binnendienst": "Opmerkingen voor Binnendienst",
 }
 
-# Table 4: Subproducten (18 velden)
+# Table 4: Subproducten (15 velden - verkoop data only)
 SUBPRODUCTEN_FIELDS = {
     # Identificatie
     "element_id_ref": "Element ID Ref",
@@ -148,22 +152,37 @@ SUBPRODUCTEN_FIELDS = {
     "subproduct_categorie": "Subproduct Categorie",
     "bron": "Bron",
 
-    # Prijzen
-    "prijs_per_stuk_excl_btw": "Prijs Per Stuk Excl BTW",
+    # Prijzen (verkoop)
+    "prijs_per_stuk_excl_btw": "Prijs Per Stuk (Excl BTW)",
     "aantal": "Aantal",
-    "subtotaal_excl_btw": "Subtotaal Excl BTW",
+    "verkoopprijs_totaal_excl_btw": "Verkoopprijs totaal (Excl BTW)",
 
     # Offorte Meta
     "product_id": "Product ID",
     "sku": "SKU",
-
-    # Nacalculatie
-    "kostprijs_per_stuk": "Kostprijs Per Stuk",
-    "kostprijs_totaal": "Kostprijs Totaal",
-    "marge_percentage": "Marge Percentage",
 }
 
-# Table 5: Nacalculatie (25 velden)
+# Table 5: Subproducten Kostprijzen (11 velden - kostprijs data only)
+SUBPRODUCTEN_KOSTPRIJZEN_FIELDS = {
+    # Identificatie
+    "subproduct_id_ref": "Subproduct ID Ref",  # Link to Subproducten
+    "opdrachtnummer": "Opdrachtnummer",  # Lookup
+    "klantnaam": "Klantnaam",  # Lookup
+    "subproduct_naam": "Subproduct Naam",  # Lookup
+
+    # Kostprijs
+    "kostprijs_per_stuk": "Kostprijs Per Stuk (Excl BTW)",
+    "kostprijs_totaal": "Kostprijs Totaal (Excl BTW)",  # Formula in Airtable
+    "marge_euro": "Marge (Euro)",  # Formula in Airtable
+    "marge_percentage": "Marge (%)",  # Formula in Airtable
+
+    # Metadata
+    "leverancier": "Leverancier",
+    "status": "Status",
+    "notities": "Notities",
+}
+
+# Table 6: Nacalculatie (25 velden)
 NACALCULATIE_FIELDS = {
     # Identificatie
     "element_id_ref": "Element ID Ref",
@@ -310,12 +329,12 @@ TABLE_CONFIGS: Dict[str, TableConfig] = {
         key_field="Element ID",
         fields=ELEMENTEN_OVERZICHT_FIELDS
     ),
-    "element_specificaties": TableConfig(
-        name="Element Specificaties",
+    "hoofdproduct_specificaties": TableConfig(
+        name="Hoofdproduct Specificaties",
         base_type="sales",
         airtable_base_id="airtable_base_stb_sales",
         key_field="Element ID Ref",
-        fields=ELEMENT_SPECIFICATIES_FIELDS
+        fields=HOOFDPRODUCT_SPECIFICATIES_FIELDS
     ),
     "subproducten": TableConfig(
         name="Subproducten",
@@ -323,6 +342,13 @@ TABLE_CONFIGS: Dict[str, TableConfig] = {
         airtable_base_id="airtable_base_stb_sales",
         key_field="Element ID Ref",  # Not unique, multiple per element
         fields=SUBPRODUCTEN_FIELDS
+    ),
+    "subproducten_kostprijzen": TableConfig(
+        name="Subproducten Kostprijzen",
+        base_type="sales",
+        airtable_base_id="airtable_base_stb_sales",
+        key_field="Subproduct ID Ref",  # Not unique if manually added
+        fields=SUBPRODUCTEN_KOSTPRIJZEN_FIELDS
     ),
     "nacalculatie": TableConfig(
         name="Nacalculatie",
