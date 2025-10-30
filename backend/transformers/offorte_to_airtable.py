@@ -154,9 +154,9 @@ def transform_pricetable_to_element(
     element_total_excl = element_subtotal - element_discount
 
     # Calculate BTW (21% is default in NL)
-    # Note: Airtable percent field expects the actual percentage number (21, not 0.21)
-    btw_percentage = 21  # 21% for Airtable percent field
-    element_btw = element_total_excl * (btw_percentage / 100)  # Calculate actual BTW amount
+    # Note: Airtable percent field expects decimal (0.21 for 21%)
+    btw_percentage = 0.21  # 21% as decimal for Airtable
+    element_btw = element_total_excl * btw_percentage  # Calculate actual BTW amount
     element_total_incl = element_total_excl + element_btw
 
     return {
@@ -388,9 +388,6 @@ def transform_pricetable_rows_to_subproducten(
             subproduct_type = "Accessoire"
 
         subproducten.append({
-            # Unique ID
-            "Subproduct ID": subproduct_id,
-
             # Links
             "Element ID Ref": element_id,
             "Opdrachtnummer": proposal_id,
